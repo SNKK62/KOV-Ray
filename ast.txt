@@ -1,0 +1,790 @@
+[
+    Camera {
+        span: LocatedSpan {
+            offset: 13,
+            line: 2,
+            fragment: "lookfrom: <1, 2, 3>,\n    lookat: <0, 0, 0>,\n    angle: 60,\n}\n\n",
+            extra: (),
+        },
+        lookfrom: Expression {
+            expr: Vec3(
+                Expression {
+                    expr: NumLiteral(
+                        1.0,
+                    ),
+                    span: LocatedSpan {
+                        offset: 24,
+                        line: 2,
+                        fragment: "1",
+                        extra: (),
+                    },
+                },
+                Expression {
+                    expr: NumLiteral(
+                        2.0,
+                    ),
+                    span: LocatedSpan {
+                        offset: 27,
+                        line: 2,
+                        fragment: "2",
+                        extra: (),
+                    },
+                },
+                Expression {
+                    expr: NumLiteral(
+                        3.0,
+                    ),
+                    span: LocatedSpan {
+                        offset: 30,
+                        line: 2,
+                        fragment: "3",
+                        extra: (),
+                    },
+                },
+            ),
+            span: LocatedSpan {
+                offset: 23,
+                line: 2,
+                fragment: "<1, 2, 3>",
+                extra: (),
+            },
+        },
+        lookat: Expression {
+            expr: Vec3(
+                Expression {
+                    expr: NumLiteral(
+                        0.0,
+                    ),
+                    span: LocatedSpan {
+                        offset: 47,
+                        line: 3,
+                        fragment: "0",
+                        extra: (),
+                    },
+                },
+                Expression {
+                    expr: NumLiteral(
+                        0.0,
+                    ),
+                    span: LocatedSpan {
+                        offset: 50,
+                        line: 3,
+                        fragment: "0",
+                        extra: (),
+                    },
+                },
+                Expression {
+                    expr: NumLiteral(
+                        0.0,
+                    ),
+                    span: LocatedSpan {
+                        offset: 53,
+                        line: 3,
+                        fragment: "0",
+                        extra: (),
+                    },
+                },
+            ),
+            span: LocatedSpan {
+                offset: 46,
+                line: 3,
+                fragment: "<0, 0, 0>",
+                extra: (),
+            },
+        },
+        angle: Expression {
+            expr: NumLiteral(
+                60.0,
+            ),
+            span: LocatedSpan {
+                offset: 68,
+                line: 4,
+                fragment: "60",
+                extra: (),
+            },
+        },
+    },
+    Object {
+        span: LocatedSpan {
+            offset: 75,
+            line: 7,
+            fragment: "Sphere {\n    center: <0, 0, 0>,\n    radius: 0.5,\n    material: Metal(<200, 100, 50>, 0.6),\n    translate: <3, 4, 5>,\n}\n\n",
+            extra: (),
+        },
+        object: Sphere {
+            center: Expression {
+                expr: Vec3(
+                    Expression {
+                        expr: NumLiteral(
+                            0.0,
+                        ),
+                        span: LocatedSpan {
+                            offset: 97,
+                            line: 8,
+                            fragment: "0",
+                            extra: (),
+                        },
+                    },
+                    Expression {
+                        expr: NumLiteral(
+                            0.0,
+                        ),
+                        span: LocatedSpan {
+                            offset: 100,
+                            line: 8,
+                            fragment: "0",
+                            extra: (),
+                        },
+                    },
+                    Expression {
+                        expr: NumLiteral(
+                            0.0,
+                        ),
+                        span: LocatedSpan {
+                            offset: 103,
+                            line: 8,
+                            fragment: "0",
+                            extra: (),
+                        },
+                    },
+                ),
+                span: LocatedSpan {
+                    offset: 96,
+                    line: 8,
+                    fragment: "<0, 0, 0>",
+                    extra: (),
+                },
+            },
+            radius: Expression {
+                expr: NumLiteral(
+                    0.5,
+                ),
+                span: LocatedSpan {
+                    offset: 119,
+                    line: 9,
+                    fragment: "0.5",
+                    extra: (),
+                },
+            },
+            material: Expression {
+                expr: Material(
+                    Metal {
+                        color: Expression {
+                            expr: Vec3(
+                                Expression {
+                                    expr: NumLiteral(
+                                        200.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 145,
+                                        line: 10,
+                                        fragment: "200",
+                                        extra: (),
+                                    },
+                                },
+                                Expression {
+                                    expr: NumLiteral(
+                                        100.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 150,
+                                        line: 10,
+                                        fragment: "100",
+                                        extra: (),
+                                    },
+                                },
+                                Expression {
+                                    expr: NumLiteral(
+                                        50.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 155,
+                                        line: 10,
+                                        fragment: "50",
+                                        extra: (),
+                                    },
+                                },
+                            ),
+                            span: LocatedSpan {
+                                offset: 144,
+                                line: 10,
+                                fragment: "<200, 100, 50>",
+                                extra: (),
+                            },
+                        },
+                        fuzz: Expression {
+                            expr: NumLiteral(
+                                0.6,
+                            ),
+                            span: LocatedSpan {
+                                offset: 160,
+                                line: 10,
+                                fragment: "0.6",
+                                extra: (),
+                            },
+                        },
+                    },
+                ),
+                span: LocatedSpan {
+                    offset: 143,
+                    line: 10,
+                    fragment: "(<200, 100, 50>, 0.6)",
+                    extra: (),
+                },
+            },
+            translate: Some(
+                Expression {
+                    expr: Vec3(
+                        Expression {
+                            expr: NumLiteral(
+                                3.0,
+                            ),
+                            span: LocatedSpan {
+                                offset: 182,
+                                line: 11,
+                                fragment: "3",
+                                extra: (),
+                            },
+                        },
+                        Expression {
+                            expr: NumLiteral(
+                                4.0,
+                            ),
+                            span: LocatedSpan {
+                                offset: 185,
+                                line: 11,
+                                fragment: "4",
+                                extra: (),
+                            },
+                        },
+                        Expression {
+                            expr: NumLiteral(
+                                5.0,
+                            ),
+                            span: LocatedSpan {
+                                offset: 188,
+                                line: 11,
+                                fragment: "5",
+                                extra: (),
+                            },
+                        },
+                    ),
+                    span: LocatedSpan {
+                        offset: 181,
+                        line: 11,
+                        fragment: "<3, 4, 5>",
+                        extra: (),
+                    },
+                },
+            ),
+            rotate: None,
+        },
+    },
+    Object {
+        span: LocatedSpan {
+            offset: 195,
+            line: 14,
+            fragment: "{\n    Box {\n        vertex: (<1, 2, 3>, <4, 5, 6>),\n        material: Lambertian(Solid(<50, 50, 50>)),\n        translate: <1, 1, 1>,\n    }\n    Plane {\n        vertex: (<1, 2, 3>, <4, 5, 6>),\n        material: Metal(<200, 100, 50>, 0.6),\n        rotate: <10, 20, 40>,\n    }\n    translate: <20, 30, 20>,\n    rotate: <30, 30, 30>,\n}\n",
+            extra: (),
+        },
+        object: Objects {
+            objects: [
+                Box {
+                    vertex: (
+                        Expression {
+                            expr: Vec3(
+                                Expression {
+                                    expr: NumLiteral(
+                                        1.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 225,
+                                        line: 16,
+                                        fragment: "1",
+                                        extra: (),
+                                    },
+                                },
+                                Expression {
+                                    expr: NumLiteral(
+                                        2.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 228,
+                                        line: 16,
+                                        fragment: "2",
+                                        extra: (),
+                                    },
+                                },
+                                Expression {
+                                    expr: NumLiteral(
+                                        3.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 231,
+                                        line: 16,
+                                        fragment: "3",
+                                        extra: (),
+                                    },
+                                },
+                            ),
+                            span: LocatedSpan {
+                                offset: 224,
+                                line: 16,
+                                fragment: "<1, 2, 3>",
+                                extra: (),
+                            },
+                        },
+                        Expression {
+                            expr: Vec3(
+                                Expression {
+                                    expr: NumLiteral(
+                                        4.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 236,
+                                        line: 16,
+                                        fragment: "4",
+                                        extra: (),
+                                    },
+                                },
+                                Expression {
+                                    expr: NumLiteral(
+                                        5.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 239,
+                                        line: 16,
+                                        fragment: "5",
+                                        extra: (),
+                                    },
+                                },
+                                Expression {
+                                    expr: NumLiteral(
+                                        6.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 242,
+                                        line: 16,
+                                        fragment: "6",
+                                        extra: (),
+                                    },
+                                },
+                            ),
+                            span: LocatedSpan {
+                                offset: 235,
+                                line: 16,
+                                fragment: "<4, 5, 6>",
+                                extra: (),
+                            },
+                        },
+                    ),
+                    material: Expression {
+                        expr: Material(
+                            Lambertian(
+                                Expression {
+                                    expr: Texture(
+                                        SolidColor(
+                                            Expression {
+                                                expr: Vec3(
+                                                    Expression {
+                                                        expr: NumLiteral(
+                                                            50.0,
+                                                        ),
+                                                        span: LocatedSpan {
+                                                            offset: 283,
+                                                            line: 17,
+                                                            fragment: "50",
+                                                            extra: (),
+                                                        },
+                                                    },
+                                                    Expression {
+                                                        expr: NumLiteral(
+                                                            50.0,
+                                                        ),
+                                                        span: LocatedSpan {
+                                                            offset: 287,
+                                                            line: 17,
+                                                            fragment: "50",
+                                                            extra: (),
+                                                        },
+                                                    },
+                                                    Expression {
+                                                        expr: NumLiteral(
+                                                            50.0,
+                                                        ),
+                                                        span: LocatedSpan {
+                                                            offset: 291,
+                                                            line: 17,
+                                                            fragment: "50",
+                                                            extra: (),
+                                                        },
+                                                    },
+                                                ),
+                                                span: LocatedSpan {
+                                                    offset: 282,
+                                                    line: 17,
+                                                    fragment: "<50, 50, 50>",
+                                                    extra: (),
+                                                },
+                                            },
+                                        ),
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 281,
+                                        line: 17,
+                                        fragment: "(<50, 50, 50>)",
+                                        extra: (),
+                                    },
+                                },
+                            ),
+                        ),
+                        span: LocatedSpan {
+                            offset: 275,
+                            line: 17,
+                            fragment: "(Solid(<50, 50, 50>))",
+                            extra: (),
+                        },
+                    },
+                    translate: Some(
+                        Expression {
+                            expr: Vec3(
+                                Expression {
+                                    expr: NumLiteral(
+                                        1.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 318,
+                                        line: 18,
+                                        fragment: "1",
+                                        extra: (),
+                                    },
+                                },
+                                Expression {
+                                    expr: NumLiteral(
+                                        1.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 321,
+                                        line: 18,
+                                        fragment: "1",
+                                        extra: (),
+                                    },
+                                },
+                                Expression {
+                                    expr: NumLiteral(
+                                        1.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 324,
+                                        line: 18,
+                                        fragment: "1",
+                                        extra: (),
+                                    },
+                                },
+                            ),
+                            span: LocatedSpan {
+                                offset: 317,
+                                line: 18,
+                                fragment: "<1, 1, 1>",
+                                extra: (),
+                            },
+                        },
+                    ),
+                    rotate: None,
+                },
+                Plane {
+                    vertex: (
+                        Expression {
+                            expr: Vec3(
+                                Expression {
+                                    expr: NumLiteral(
+                                        1.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 364,
+                                        line: 21,
+                                        fragment: "1",
+                                        extra: (),
+                                    },
+                                },
+                                Expression {
+                                    expr: NumLiteral(
+                                        2.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 367,
+                                        line: 21,
+                                        fragment: "2",
+                                        extra: (),
+                                    },
+                                },
+                                Expression {
+                                    expr: NumLiteral(
+                                        3.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 370,
+                                        line: 21,
+                                        fragment: "3",
+                                        extra: (),
+                                    },
+                                },
+                            ),
+                            span: LocatedSpan {
+                                offset: 363,
+                                line: 21,
+                                fragment: "<1, 2, 3>",
+                                extra: (),
+                            },
+                        },
+                        Expression {
+                            expr: Vec3(
+                                Expression {
+                                    expr: NumLiteral(
+                                        4.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 375,
+                                        line: 21,
+                                        fragment: "4",
+                                        extra: (),
+                                    },
+                                },
+                                Expression {
+                                    expr: NumLiteral(
+                                        5.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 378,
+                                        line: 21,
+                                        fragment: "5",
+                                        extra: (),
+                                    },
+                                },
+                                Expression {
+                                    expr: NumLiteral(
+                                        6.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 381,
+                                        line: 21,
+                                        fragment: "6",
+                                        extra: (),
+                                    },
+                                },
+                            ),
+                            span: LocatedSpan {
+                                offset: 374,
+                                line: 21,
+                                fragment: "<4, 5, 6>",
+                                extra: (),
+                            },
+                        },
+                    ),
+                    material: Expression {
+                        expr: Material(
+                            Metal {
+                                color: Expression {
+                                    expr: Vec3(
+                                        Expression {
+                                            expr: NumLiteral(
+                                                200.0,
+                                            ),
+                                            span: LocatedSpan {
+                                                offset: 411,
+                                                line: 22,
+                                                fragment: "200",
+                                                extra: (),
+                                            },
+                                        },
+                                        Expression {
+                                            expr: NumLiteral(
+                                                100.0,
+                                            ),
+                                            span: LocatedSpan {
+                                                offset: 416,
+                                                line: 22,
+                                                fragment: "100",
+                                                extra: (),
+                                            },
+                                        },
+                                        Expression {
+                                            expr: NumLiteral(
+                                                50.0,
+                                            ),
+                                            span: LocatedSpan {
+                                                offset: 421,
+                                                line: 22,
+                                                fragment: "50",
+                                                extra: (),
+                                            },
+                                        },
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 410,
+                                        line: 22,
+                                        fragment: "<200, 100, 50>",
+                                        extra: (),
+                                    },
+                                },
+                                fuzz: Expression {
+                                    expr: NumLiteral(
+                                        0.6,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 426,
+                                        line: 22,
+                                        fragment: "0.6",
+                                        extra: (),
+                                    },
+                                },
+                            },
+                        ),
+                        span: LocatedSpan {
+                            offset: 409,
+                            line: 22,
+                            fragment: "(<200, 100, 50>, 0.6)",
+                            extra: (),
+                        },
+                    },
+                    translate: None,
+                    rotate: Some(
+                        Expression {
+                            expr: Vec3(
+                                Expression {
+                                    expr: NumLiteral(
+                                        10.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 449,
+                                        line: 23,
+                                        fragment: "10",
+                                        extra: (),
+                                    },
+                                },
+                                Expression {
+                                    expr: NumLiteral(
+                                        20.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 453,
+                                        line: 23,
+                                        fragment: "20",
+                                        extra: (),
+                                    },
+                                },
+                                Expression {
+                                    expr: NumLiteral(
+                                        40.0,
+                                    ),
+                                    span: LocatedSpan {
+                                        offset: 457,
+                                        line: 23,
+                                        fragment: "40",
+                                        extra: (),
+                                    },
+                                },
+                            ),
+                            span: LocatedSpan {
+                                offset: 448,
+                                line: 23,
+                                fragment: "<10, 20, 40>",
+                                extra: (),
+                            },
+                        },
+                    ),
+                },
+            ],
+            translate: Some(
+                Expression {
+                    expr: Vec3(
+                        Expression {
+                            expr: NumLiteral(
+                                20.0,
+                            ),
+                            span: LocatedSpan {
+                                offset: 484,
+                                line: 25,
+                                fragment: "20",
+                                extra: (),
+                            },
+                        },
+                        Expression {
+                            expr: NumLiteral(
+                                30.0,
+                            ),
+                            span: LocatedSpan {
+                                offset: 488,
+                                line: 25,
+                                fragment: "30",
+                                extra: (),
+                            },
+                        },
+                        Expression {
+                            expr: NumLiteral(
+                                20.0,
+                            ),
+                            span: LocatedSpan {
+                                offset: 492,
+                                line: 25,
+                                fragment: "20",
+                                extra: (),
+                            },
+                        },
+                    ),
+                    span: LocatedSpan {
+                        offset: 483,
+                        line: 25,
+                        fragment: "<20, 30, 20>",
+                        extra: (),
+                    },
+                },
+            ),
+            rotate: Some(
+                Expression {
+                    expr: Vec3(
+                        Expression {
+                            expr: NumLiteral(
+                                30.0,
+                            ),
+                            span: LocatedSpan {
+                                offset: 510,
+                                line: 26,
+                                fragment: "30",
+                                extra: (),
+                            },
+                        },
+                        Expression {
+                            expr: NumLiteral(
+                                30.0,
+                            ),
+                            span: LocatedSpan {
+                                offset: 514,
+                                line: 26,
+                                fragment: "30",
+                                extra: (),
+                            },
+                        },
+                        Expression {
+                            expr: NumLiteral(
+                                30.0,
+                            ),
+                            span: LocatedSpan {
+                                offset: 518,
+                                line: 26,
+                                fragment: "30",
+                                extra: (),
+                            },
+                        },
+                    ),
+                    span: LocatedSpan {
+                        offset: 509,
+                        line: 26,
+                        fragment: "<30, 30, 30>",
+                        extra: (),
+                    },
+                },
+            ),
+        },
+    },
+]
