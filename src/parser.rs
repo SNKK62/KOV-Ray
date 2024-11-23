@@ -375,15 +375,15 @@ fn texture(i: Span) -> IResult<Span, Expression> {
 }
 
 fn objects(i: Span) -> IResult<Span, Object> {
-    let (i0, _) = space_delimited(open_brace)(i)?;
-    let (i, objects) = many1(object)(i0)?;
+    let (i0, _) = space_delimited(tag("Objs"))(i)?;
+    let (i, _) = space_delimited(open_brace)(i0)?;
+    let (i, objects) = many1(object)(i)?;
 
     let mut translate: Option<Expression> = None;
     let mut rotate: Option<Expression> = None;
 
     let mut i_start = i;
     loop {
-        println!("{:?}", i);
         let (i, attr) = opt(preceded(
             space_delimited(tag("translate:")),
             pair(space_delimited(vec3_expr), space_delimited(tag(","))),
@@ -426,7 +426,6 @@ fn sphere_object(i: Span) -> IResult<Span, Object> {
 
     let mut i_start = i;
     loop {
-        println!("{:?}", i);
         let (i, attr) = opt(preceded(
             space_delimited(tag("center:")),
             pair(space_delimited(vec3_expr), space_delimited(tag(","))),
@@ -504,7 +503,6 @@ fn general_square_object_properties(i: Span) -> IResult<Span, SquareObjectProper
 
     let mut i_start = i;
     loop {
-        println!("yes!!{:?}", i_start);
         let (i, attr) = opt(preceded(
             space_delimited(tag("vertex:")),
             tuple((
@@ -619,7 +617,6 @@ fn camera_statement(i: Span) -> IResult<Span, Statement> {
     let i0 = i;
     let mut i_start = i;
     loop {
-        println!("{:?}", i);
         let (i, attr) = opt(preceded(
             space_delimited(tag("lookfrom:")),
             pair(space_delimited(vec3_expr), space_delimited(tag(","))),
@@ -676,17 +673,16 @@ fn config_statement(i: Span) -> IResult<Span, Statement> {
     let i0 = i;
     let mut i_start = i;
     loop {
-        println!("{:?}", i);
         let (i, attr) = opt(preceded(
             space_delimited(tag("width:")),
-            pair(space_delimited(vec3_expr), space_delimited(tag(","))),
+            pair(space_delimited(expr), space_delimited(tag(","))),
         ))(i_start)?;
         if let Some(attr) = attr {
             width = Some(attr.0);
         }
         let (i, attr) = opt(preceded(
             space_delimited(tag("height:")),
-            pair(space_delimited(vec3_expr), space_delimited(tag(","))),
+            pair(space_delimited(expr), space_delimited(tag(","))),
         ))(i)?;
         if let Some(attr) = attr {
             height = Some(attr.0);

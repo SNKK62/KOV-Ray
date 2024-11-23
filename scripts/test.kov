@@ -4,6 +4,13 @@ Camera {
     angle: 60,
 }
 
+Config {
+    width: 512,
+    height: 512,
+    samples_per_pixel: 100,
+    max_depth: 100,
+}
+
 Sphere {
     center: <0, 0, 0>,
     radius: 0.5,
@@ -11,7 +18,7 @@ Sphere {
     translate: <3, 4, 5>,
 }
 
-{
+Objs {
     Box {
         vertex: (<1, 2, 3>, <4, 5, 6>),
         material: Lambertian(Solid(<50, 50, 50>)),
