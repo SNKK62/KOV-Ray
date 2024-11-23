@@ -1,3 +1,4 @@
+pub mod ast;
 pub mod parser;
 
 // ref: https://github.com/msakuta/ruscal/blob/ed869ab38ba0608b75ec63040bcc06eb8a6fc5d7/src/lib.rs

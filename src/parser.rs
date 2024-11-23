@@ -1,20 +1,21 @@
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::{alpha1, alphanumeric1, char, multispace0, multispace1, none_of},
+    character::complete::{alpha1, alphanumeric1, char, multispace0, none_of},
     combinator::{cut, map_res, opt, recognize},
     error::ParseError,
-    multi::{fold_many0, many0, many1, separated_list0},
+    multi::{fold_many0, many0, many1},
     number::complete::recognize_float,
     sequence::{delimited, pair, preceded, terminated, tuple},
     Finish, IResult, InputTake, Offset, Parser,
 };
-use nom_locate::LocatedSpan;
 use std::{collections::HashMap, error::Error};
+
+use crate::ast::{ExprEnum, Expression, Material, Object, Span, Statement, Texture, AST};
 
 pub type Functions<'src> = HashMap<String, FnDecl>;
 
-fn unary_fn<'a>(f: fn(f64) -> f64) -> FnDecl {
+fn unary_fn(f: fn(f64) -> f64) -> FnDecl {
     FnDecl::Native(NativeFn {
         code: Box::new(move |args| {
             let arg = args.iter().next().expect("function missing argument");
@@ -23,7 +24,7 @@ fn unary_fn<'a>(f: fn(f64) -> f64) -> FnDecl {
     })
 }
 
-fn binary_fn<'a>(f: fn(f64, f64) -> f64) -> FnDecl {
+fn binary_fn(f: fn(f64, f64) -> f64) -> FnDecl {
     FnDecl::Native(NativeFn {
         code: Box::new(move |args| {
             let mut args = args.iter();
@@ -51,8 +52,6 @@ pub fn standard_functions<'src>() -> Functions<'src> {
     funcs
 }
 
-pub type Span<'a> = LocatedSpan<&'a str>;
-
 pub enum FnDecl {
     Native(NativeFn),
 }
@@ -60,162 +59,6 @@ pub enum FnDecl {
 type NativeFnCode = dyn Fn(&[f64]) -> f64;
 pub struct NativeFn {
     pub code: Box<NativeFnCode>,
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum ExprEnum<'src> {
-    Ident(Span<'src>),
-    NumLiteral(f64),
-    StrLiteral(String),
-    FnInvoke(Span<'src>, Vec<Expression<'src>>),
-    Add(Box<Expression<'src>>, Box<Expression<'src>>),
-    Sub(Box<Expression<'src>>, Box<Expression<'src>>),
-    Mul(Box<Expression<'src>>, Box<Expression<'src>>),
-    Div(Box<Expression<'src>>, Box<Expression<'src>>),
-    And(Box<Expression<'src>>, Box<Expression<'src>>),
-    Or(Box<Expression<'src>>, Box<Expression<'src>>),
-    Gt(Box<Expression<'src>>, Box<Expression<'src>>),
-    Lt(Box<Expression<'src>>, Box<Expression<'src>>),
-    Eq(Box<Expression<'src>>, Box<Expression<'src>>),
-    Neq(Box<Expression<'src>>, Box<Expression<'src>>),
-    Not(Box<Expression<'src>>),
-    Vec3(
-        Box<Expression<'src>>,
-        Box<Expression<'src>>,
-        Box<Expression<'src>>,
-    ),
-    Material(Box<Material<'src>>),
-    Texture(Box<Texture<'src>>),
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct Expression<'a> {
-    pub(crate) expr: ExprEnum<'a>,
-    pub(crate) span: Span<'a>,
-}
-
-impl<'a> Expression<'a> {
-    fn new(expr: ExprEnum<'a>, span: Span<'a>) -> Self {
-        Self { expr, span }
-    }
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum Statement<'src> {
-    Expression(Expression<'src>),
-    VarDef {
-        span: Span<'src>,
-        name: Span<'src>,
-        ex: Expression<'src>,
-    },
-    VarAssign {
-        span: Span<'src>,
-        name: Span<'src>,
-        ex: Expression<'src>,
-    },
-    If {
-        span: Span<'src>,
-        cond: Box<Expression<'src>>,
-        stmts: Box<Statements<'src>>,
-        else_stmts: Option<Box<Statements<'src>>>,
-    },
-    While {
-        span: Span<'src>,
-        cond: Expression<'src>,
-        stmts: Statements<'src>,
-    },
-    Break,
-    Continue,
-    Object {
-        span: Span<'src>,
-        object: Object<'src>,
-    },
-    Camera {
-        span: Span<'src>,
-        lookfrom: Expression<'src>,
-        lookat: Expression<'src>,
-        angle: Expression<'src>,
-    },
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum Object<'src> {
-    Objects {
-        objects: Vec<Object<'src>>,
-        translate: Option<Expression<'src>>,
-        rotate: Option<Expression<'src>>,
-    },
-    Sphere {
-        center: Expression<'src>,
-        radius: Expression<'src>,
-        material: Expression<'src>, // Expression::Material
-        translate: Option<Expression<'src>>,
-        rotate: Option<Expression<'src>>,
-    },
-    Box {
-        vertex: (Expression<'src>, Expression<'src>),
-        material: Expression<'src>, // Expression::Material
-        translate: Option<Expression<'src>>,
-        rotate: Option<Expression<'src>>,
-    },
-    Plane {
-        vertex: (Expression<'src>, Expression<'src>),
-        material: Expression<'src>, // Expression::Material
-        translate: Option<Expression<'src>>,
-        rotate: Option<Expression<'src>>,
-    },
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum Material<'src> {
-    Lambertian(Expression<'src>), // Expression::Texture
-    Metal {
-        color: Expression<'src>,
-        fuzz: Expression<'src>,
-    },
-    Dielectric {
-        reflection_index: Expression<'src>,
-    },
-    Light {
-        color: Expression<'src>,
-        intensity: Expression<'src>,
-    },
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum Texture<'src> {
-    SolidColor(Expression<'src>),
-    Checker(Expression<'src>, Expression<'src>),
-    Perlin(Expression<'src>), // scale: f64
-                              // TODO: ImageTexture
-}
-
-impl<'src> Statement<'src> {
-    fn span(&self) -> Option<Span<'src>> {
-        use Statement::*;
-        Some(match self {
-            Expression(ex) => ex.span,
-            VarDef { span, .. } => *span,
-            VarAssign { span, .. } => *span,
-            If { span, .. } => *span,
-            While { span, .. } => *span,
-            Object { span, .. } => *span,
-            Camera { span, .. } => *span,
-            Break | Continue => return None,
-        })
-    }
-}
-
-trait GetSpan<'a> {
-    fn span(&self) -> Span<'a>;
-}
-
-pub type Statements<'src> = Vec<Statement<'src>>;
-
-impl<'a> GetSpan<'a> for Statements<'a> {
-    fn span(&self) -> Span<'a> {
-        self.iter().find_map(|stmt| stmt.span()).unwrap()
-    }
 }
 
 fn space_delimited<'src, O, E>(
@@ -452,7 +295,7 @@ fn lambertian_material(i: Span) -> IResult<Span, Expression> {
         i,
         Expression {
             span: calc_offset(i0, i),
-            expr: ExprEnum::Material(Box::new(Material::Lambertian(texture))),
+            expr: ExprEnum::Material(Box::new(Material::Lambertian { texture })),
         },
     ))
 }
@@ -822,23 +665,68 @@ fn camera_statement(i: Span) -> IResult<Span, Statement> {
     ))
 }
 
-fn var_def(i: Span) -> IResult<Span, Statement> {
-    let span = i;
-    let (i, _) = delimited(multispace0, tag("var"), multispace1)(i)?;
-    let (i, (name, ex)) = cut(|i| {
-        let (i, name) = space_delimited(identifier)(i)?;
-        let (i, _) = space_delimited(char('='))(i)?;
-        let (i, ex) = space_delimited(expr)(i)?;
-        let (i, _) = space_delimited(char(';'))(i)?;
-        Ok((i, (name, ex)))
-    })(i)?;
+fn config_statement(i: Span) -> IResult<Span, Statement> {
+    let (i, _) = space_delimited(tag("Config"))(i)?;
+    let (i, _) = space_delimited(open_brace)(i)?;
+
+    let mut width: Option<Expression> = None;
+    let mut height: Option<Expression> = None;
+    let mut samples_per_pixel: Option<Expression> = None;
+    let mut max_depth: Option<Expression> = None;
+    let i0 = i;
+    let mut i_start = i;
+    loop {
+        println!("{:?}", i);
+        let (i, attr) = opt(preceded(
+            space_delimited(tag("width:")),
+            pair(space_delimited(vec3_expr), space_delimited(tag(","))),
+        ))(i_start)?;
+        if let Some(attr) = attr {
+            width = Some(attr.0);
+        }
+        let (i, attr) = opt(preceded(
+            space_delimited(tag("height:")),
+            pair(space_delimited(vec3_expr), space_delimited(tag(","))),
+        ))(i)?;
+        if let Some(attr) = attr {
+            height = Some(attr.0);
+        }
+        let (i, attr) = opt(preceded(
+            space_delimited(tag("samples_per_pixel:")),
+            pair(space_delimited(expr), space_delimited(tag(","))),
+        ))(i)?;
+        if let Some(attr) = attr {
+            samples_per_pixel = Some(attr.0);
+        }
+        let (i, attr) = opt(preceded(
+            space_delimited(tag("max_depth:")),
+            pair(space_delimited(expr), space_delimited(tag(","))),
+        ))(i)?;
+        if let Some(attr) = attr {
+            max_depth = Some(attr.0);
+        }
+        let (i, res) = opt(space_delimited(close_brace))(i)?;
+        i_start = i;
+        if res.is_some() {
+            break;
+        }
+    }
+
+    if max_depth.is_none() || samples_per_pixel.is_none() || width.is_none() || height.is_none() {
+        return Err(nom::Err::Error(nom::error::Error {
+            input: i_start,
+            code: nom::error::ErrorKind::Tag,
+        }));
+    }
     Ok((
-        i,
-        Statement::VarDef {
-            span: calc_offset(span, i),
-            name,
-            ex,
-        },
+        i_start,
+        (Statement::Config {
+            span: calc_offset(i0, i_start),
+            width: width.unwrap(),
+            height: height.unwrap(),
+            samples_per_pixel: samples_per_pixel.unwrap(),
+            max_depth: max_depth.unwrap(),
+        }),
     ))
 }
 
@@ -930,8 +818,8 @@ pub fn statement(i: Span) -> IResult<Span, Statement> {
     alt((
         object_statement,
         camera_statement,
+        config_statement,
         comment_statement,
-        var_def,
         var_assign,
         if_statement,
         while_statement,
@@ -941,13 +829,19 @@ pub fn statement(i: Span) -> IResult<Span, Statement> {
     ))(i)
 }
 
-fn statements(i: Span) -> IResult<Span, Statements> {
+fn statements(i: Span) -> IResult<Span, AST> {
     let (i, stmts) = many0(statement)(i)?;
     let (i, _) = opt(multispace0)(i)?;
     Ok((i, stmts))
 }
 
-pub fn statements_finish(i: Span) -> Result<Statements, nom::error::Error<Span>> {
+pub fn statements_finish(i: Span) -> Result<AST, nom::error::Error<Span>> {
     let (_, res) = statements(i).finish()?;
+    Ok(res)
+}
+
+pub fn parse<'a>(i: &'a str) -> Result<AST<'a>, Box<dyn Error + 'a>> {
+    let i = Span::new(i);
+    let res = statements_finish(i)?;
     Ok(res)
 }

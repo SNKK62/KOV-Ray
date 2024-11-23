@@ -9,7 +9,7 @@ fn main() {
         std::process::exit(1);
     });
     let output = args.output;
-    let ast = parser::statements_finish(parser::Span::new(&source)).unwrap_or_else(|e| {
+    let ast = parser::parse(&source).unwrap_or_else(|e| {
         eprintln!("Failed to parse file {}:\n {}", source_file_name, e);
         std::process::exit(1)
     });
