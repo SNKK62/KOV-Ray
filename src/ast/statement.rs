@@ -37,6 +37,7 @@ pub enum Statement<'src> {
         height: Expression<'src>,
         samples_per_pixel: Expression<'src>,
         max_depth: Expression<'src>,
+        sky_color: Option<Expression<'src>>,
     },
 }
 
