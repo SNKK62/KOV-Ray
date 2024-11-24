@@ -23,9 +23,9 @@ fn solid_texture(i: Span) -> IResult<Span, Expression> {
 fn checker_texture(i: Span) -> IResult<Span, Expression> {
     let (i0, _) = space_delimited(tag("Checker"))(i)?;
     let (i, _) = space_delimited(tag("("))(i0)?;
-    let (i, odd) = space_delimited(vec3_expr)(i)?;
+    let (i, odd) = space_delimited(texture_expr)(i)?;
     let (i, _) = space_delimited(tag(","))(i)?;
-    let (i, even) = space_delimited(vec3_expr)(i)?;
+    let (i, even) = space_delimited(texture_expr)(i)?;
     let (i, _) = space_delimited(tag(")"))(i)?;
     Ok((
         i,

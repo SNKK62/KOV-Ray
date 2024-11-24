@@ -6,4 +6,5 @@ edition = "2021"
 [dependencies]
 nom = "7.1.3"
 nom_locate = "4.2.0"
+ray-tracer-rs = {git = "https://github.com/SNKK62/toy-ray-tracer-rs", rev = "191ce997fd432b7edae0509184fe972a59295423"}
 

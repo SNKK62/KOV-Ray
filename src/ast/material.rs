@@ -7,10 +7,10 @@ pub enum Material<'src> {
     },
     Metal {
         color: Expression<'src>,
-        fuzz: Expression<'src>,
+        fuzz: Expression<'src>, // f64
     },
     Dielectric {
-        reflection_index: Expression<'src>,
+        reflection_index: Expression<'src>, // f64
     },
     Light {
         color: Expression<'src>,
