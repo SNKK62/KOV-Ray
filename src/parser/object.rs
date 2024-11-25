@@ -4,7 +4,10 @@ use super::{
     material::material_expr,
     open_brace, space_delimited,
 };
-use crate::ast::{object::AffineProperties, Expression, Object, Span};
+use crate::ast::{
+    object::{AffineProperties, Rotate, RotateAxis},
+    Expression, Object, Span,
+};
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -17,7 +20,7 @@ use std::{cell::RefCell, rc::Rc};
 
 fn affine_properties<'a>(
     i: Span<'a>,
-    properties: &Rc<RefCell<AffineProperties<'a>>>,
+    properties: &Rc<RefCell<Vec<AffineProperties<'a>>>>,
     // properties: &mut std::cell::RefMut<AffineProperties<'a>>,
 ) -> IResult<Span<'a>, ()> {
     let (i, attr) = opt(preceded(
@@ -25,28 +28,45 @@ fn affine_properties<'a>(
         pair(space_delimited(vec3_expr), space_delimited(tag(","))),
     ))(i)?;
     if let Some(attr) = attr {
-        properties.borrow_mut().translate = Some(attr.0);
+        properties
+            .borrow_mut()
+            .push(AffineProperties::Translation(attr.0));
     }
     let (i, attr) = opt(preceded(
         space_delimited(tag("rotateX:")),
         pair(space_delimited(expr), space_delimited(tag(","))),
     ))(i)?;
     if let Some(attr) = attr {
-        properties.borrow_mut().push_rotate(0, attr.0);
+        properties
+            .borrow_mut()
+            .push(AffineProperties::Rotate(Rotate {
+                axis: RotateAxis::X,
+                expr: attr.0,
+            }));
     }
     let (i, attr) = opt(preceded(
         space_delimited(tag("rotateY:")),
         pair(space_delimited(expr), space_delimited(tag(","))),
     ))(i)?;
     if let Some(attr) = attr {
-        properties.borrow_mut().push_rotate(1, attr.0);
+        properties
+            .borrow_mut()
+            .push(AffineProperties::Rotate(Rotate {
+                axis: RotateAxis::Y,
+                expr: attr.0,
+            }));
     }
     let (i, attr) = opt(preceded(
         space_delimited(tag("rotateZ:")),
         pair(space_delimited(expr), space_delimited(tag(","))),
     ))(i)?;
     if let Some(attr) = attr {
-        properties.borrow_mut().push_rotate(2, attr.0);
+        properties
+            .borrow_mut()
+            .push(AffineProperties::Rotate(Rotate {
+                axis: RotateAxis::Z,
+                expr: attr.0,
+            }));
     }
     Ok((i, ()))
 }
@@ -56,7 +76,7 @@ fn objects(i: Span) -> IResult<Span, Object> {
     let (i, _) = space_delimited(open_brace)(i0)?;
     let (i, objects) = many1(object)(i)?;
 
-    let affine = Rc::new(RefCell::new(AffineProperties::new()));
+    let affine: Rc<RefCell<Vec<AffineProperties>>> = Rc::new(RefCell::new(Vec::new()));
     let mut i_start = i;
     loop {
         let (i, _) = affine_properties(i_start, &affine)?;
@@ -77,7 +97,7 @@ fn sphere_object(i: Span) -> IResult<Span, Object> {
     let mut center: Option<Expression> = None;
     let mut radius: Option<Expression> = None;
     let mut material: Option<Expression> = None;
-    let affine = Rc::new(RefCell::new(AffineProperties::new()));
+    let affine: Rc<RefCell<Vec<AffineProperties>>> = Rc::new(RefCell::new(Vec::new()));
 
     let mut i_start = i;
     loop {
@@ -132,14 +152,14 @@ fn sphere_object(i: Span) -> IResult<Span, Object> {
 struct SquareObjectProperties<'src> {
     vertex: (Expression<'src>, Expression<'src>),
     material: Expression<'src>,
-    affine: AffineProperties<'src>,
+    affine: Vec<AffineProperties<'src>>,
 }
 fn general_square_object_properties(i: Span) -> IResult<Span, SquareObjectProperties> {
     let (i, _) = space_delimited(open_brace)(i)?;
 
     let mut vertex: Option<(Expression, Expression)> = None;
     let mut material: Option<Expression> = None;
-    let affine = Rc::new(RefCell::new(AffineProperties::new()));
+    let affine: Rc<RefCell<Vec<AffineProperties>>> = Rc::new(RefCell::new(Vec::new()));
 
     let mut i_start = i;
     loop {

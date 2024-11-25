@@ -1,21 +1,27 @@
 Camera {
-    lookfrom: <1, 2, 3>,
+    lookfrom: <20, 20, 20>,
     lookat: <0, 0, 0>,
     angle: 60,
 }
 
 Config {
-    width: 512,
-    height: 512,
+    width: 320,
+    height: 180,
     samples_per_pixel: 100,
     max_depth: 100,
 }
 
 Sphere {
     center: <0, 0, 0>,
-    radius: 0.5,
+    radius: 5,
     material: Metal(<200, 100, 50>, 0.6),
     translate: <3, 4, 5>,
+}
+
+Sphere {
+    center: <100, 100, 100>,
+    radius: 50,
+    material: Light(<1, 1, 1>, 20),
 }
 
 Objs {
@@ -25,7 +31,7 @@ Objs {
         translate: <1, 1, 1>,
     }
     Plane {
-        vertex: (<1, 2, 3>, <4, 5, 6>),
+        vertex: (<1, 2, 3>, <1, 5, 6>),
         material: Metal(<200, 100, 50>, 0.6),
         rotateX: 10,
     }

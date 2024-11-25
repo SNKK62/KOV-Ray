@@ -1,5 +1,5 @@
-use kov_ray::parser;
-use std::io::Write;
+use image::RgbImage;
+use kov_ray::{interpreter::interpret, parser};
 
 fn main() {
     let args = kov_ray::parse_args().unwrap_or_else(|| std::process::exit(1));
@@ -16,15 +16,8 @@ fn main() {
     if args.show_ast {
         println!("{:#?}", ast);
     }
-    let mut output_file = std::fs::File::create(output.clone()).unwrap_or_else(|e| {
-        eprintln!("Failed to create file {}: {}", output, e);
-        std::process::exit(1);
-    });
-    let output_ast = format!("{:#?}", ast);
-    output_file
-        .write_all(output_ast.as_bytes())
-        .unwrap_or_else(|e| {
-            eprintln!("Failed to write to file {}: {}", output, e);
-            std::process::exit(1);
-        });
+    let (image_buffer, width, height) = interpret(&ast, true);
+    let img = RgbImage::from_raw(width, height, image_buffer).expect("incorrect image buffer size");
+
+    img.save(output).expect("failed to save image");
 }

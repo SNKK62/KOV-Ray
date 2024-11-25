@@ -1,4 +1,4 @@
-use super::{Expression, Object, Span, AST};
+use super::{CameraConfig, Config, Expression, Object, Span, AST};
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Statement<'src> {
@@ -27,17 +27,11 @@ pub enum Statement<'src> {
     },
     Camera {
         span: Span<'src>,
-        lookfrom: Expression<'src>,
-        lookat: Expression<'src>,
-        angle: Expression<'src>,
+        config: CameraConfig<'src>,
     },
     Config {
         span: Span<'src>,
-        width: Expression<'src>,
-        height: Expression<'src>,
-        samples_per_pixel: Expression<'src>,
-        max_depth: Expression<'src>,
-        sky_color: Option<Expression<'src>>,
+        config: Config<'src>,
     },
 }
 

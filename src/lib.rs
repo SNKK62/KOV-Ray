@@ -78,7 +78,7 @@ Options:
 
     Some(Args {
         source,
-        output: output.unwrap_or_else(|| "ast.txt".to_string()),
+        output: output.unwrap_or_else(|| "temp.png".to_string()),
         show_ast,
     })
 }

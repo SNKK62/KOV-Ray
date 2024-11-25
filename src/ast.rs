@@ -8,6 +8,10 @@ pub mod material;
 pub use material::Material;
 pub mod texture;
 pub use texture::Texture;
+pub mod config;
+pub use config::Config;
+pub mod camera;
+pub use camera::CameraConfig;
 
 use nom_locate::LocatedSpan;
 pub type Span<'a> = LocatedSpan<&'a str>;

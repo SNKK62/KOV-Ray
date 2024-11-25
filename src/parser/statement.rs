@@ -15,7 +15,7 @@ use super::{
     object::object,
     open_brace, space_delimited,
 };
-use crate::ast::{ExprEnum, Expression, Span, Statement, AST};
+use crate::ast::{CameraConfig, Config, ExprEnum, Expression, Span, Statement, AST};
 
 fn object_statement(i0: Span) -> IResult<Span, Statement> {
     let (i, object) = object(i0)?;
@@ -34,7 +34,9 @@ fn camera_statement(i: Span) -> IResult<Span, Statement> {
 
     let mut lookfrom: Option<Expression> = None;
     let mut lookat: Option<Expression> = None;
+    let mut up: Option<Expression> = None;
     let mut angle: Option<Expression> = None;
+    let mut dist_to_focus: Option<Expression> = None;
     let i0 = i;
     let mut i_start = i;
     loop {
@@ -53,11 +55,25 @@ fn camera_statement(i: Span) -> IResult<Span, Statement> {
             lookat = Some(attr.0);
         }
         let (i, attr) = opt(preceded(
+            space_delimited(tag("up:")),
+            pair(space_delimited(vec3_expr), space_delimited(tag(","))),
+        ))(i)?;
+        if let Some(attr) = attr {
+            up = Some(attr.0);
+        }
+        let (i, attr) = opt(preceded(
             space_delimited(tag("angle:")),
             pair(space_delimited(expr), space_delimited(tag(","))),
         ))(i)?;
         if let Some(attr) = attr {
             angle = Some(attr.0);
+        }
+        let (i, attr) = opt(preceded(
+            space_delimited(tag("dist_to_focus:")),
+            pair(space_delimited(expr), space_delimited(tag(","))),
+        ))(i)?;
+        if let Some(attr) = attr {
+            dist_to_focus = Some(attr.0);
         }
         let (i, res) = opt(space_delimited(close_brace))(i)?;
         i_start = i;
@@ -76,9 +92,13 @@ fn camera_statement(i: Span) -> IResult<Span, Statement> {
         i_start,
         (Statement::Camera {
             span: calc_offset(i0, i_start),
-            lookfrom: lookfrom.unwrap(),
-            lookat: lookat.unwrap(),
-            angle: angle.unwrap(),
+            config: CameraConfig {
+                lookfrom: lookfrom.unwrap(),
+                lookat: lookat.unwrap(),
+                up,
+                angle: angle.unwrap(),
+                dist_to_focus,
+            },
         }),
     ))
 }
@@ -137,7 +157,7 @@ fn config_statement(i: Span) -> IResult<Span, Statement> {
         }
     }
 
-    if max_depth.is_none() || samples_per_pixel.is_none() || width.is_none() || height.is_none() {
+    if samples_per_pixel.is_none() || width.is_none() || height.is_none() {
         return Err(nom::Err::Error(nom::error::Error {
             input: i_start,
             code: nom::error::ErrorKind::Tag,
@@ -147,11 +167,13 @@ fn config_statement(i: Span) -> IResult<Span, Statement> {
         i_start,
         (Statement::Config {
             span: calc_offset(i0, i_start),
-            width: width.unwrap(),
-            height: height.unwrap(),
-            samples_per_pixel: samples_per_pixel.unwrap(),
-            max_depth: max_depth.unwrap(),
-            sky_color,
+            config: Config {
+                width: width.unwrap(),
+                height: height.unwrap(),
+                samples_per_pixel: samples_per_pixel.unwrap(),
+                max_depth,
+                sky_color,
+            },
         }),
     ))
 }

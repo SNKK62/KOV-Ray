@@ -18,6 +18,9 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
     match &ast.expr {
         ExprEnum::Ident(ident) => {
             let ident = ident.fragment();
+            if *ident == "PI" {
+                return Value::Num(std::f64::consts::PI);
+            }
             let val = variables
                 .get(*ident)
                 .unwrap_or_else(|| panic!("variable {} not found", *ident));

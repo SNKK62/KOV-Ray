@@ -376,8 +376,11 @@ checksum = "f5d4a7da358eff58addd2877a45865158f0d78c911d43a5784ceb7bbf52833b0"
 name = "kov-ray"
 version = "0.1.0"
 dependencies = [
+ "image",
  "nom",
  "nom_locate",
+ "pg-indicator",
+ "rand",
  "ray-tracer-rs",
 ]
 
@@ -544,6 +547,14 @@ name = "paste"
 version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
+
+[[package]]
+name = "pg-indicator"
+version = "0.1.0"
+source = "git+https://github.com/SNKK62/pg-indicator-rs?rev=26e14d1f02f3fbca623ad617fc4d6dacb01a22aa#26e14d1f02f3fbca623ad617fc4d6dacb01a22aa"
+dependencies = [
+ "libc",
+]
 
 [[package]]
 name = "pkg-config"
