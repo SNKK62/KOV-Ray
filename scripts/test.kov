@@ -9,6 +9,7 @@ Config {
     height: 180,
     samples_per_pixel: 100,
     max_depth: 100,
+    sky_color: <60, 250, 200>,
 }
 
 Sphere {
@@ -21,7 +22,7 @@ Sphere {
 Sphere {
     center: <100, 100, 100>,
     radius: 50,
-    material: Light(<1, 1, 1>, 20),
+    material: Light(<255, 255, 255>, 20),
 }
 
 Objs {

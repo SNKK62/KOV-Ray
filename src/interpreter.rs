@@ -58,7 +58,7 @@ fn eval_ast(ast: &AST) -> (Vec<Rc<dyn Hittable>>, ConfigValue, Camera) {
         0.0,
         camera_config.dist_to_focus,
         0.0,
-        0.0,
+        1.0,
     );
     (world, config, camera)
 }
