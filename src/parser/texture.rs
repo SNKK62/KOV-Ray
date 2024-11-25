@@ -1,6 +1,6 @@
 use super::{
     calc_offset,
-    expression::{expr, vec3_expr},
+    expression::{expr, vec3_ident_expr},
     space_delimited,
 };
 use crate::ast::{ExprEnum, Expression, Span, Texture};
@@ -9,7 +9,7 @@ use nom::{branch::alt, bytes::complete::tag, IResult};
 fn solid_texture(i: Span) -> IResult<Span, Expression> {
     let (i0, _) = space_delimited(tag("Solid"))(i)?;
     let (i, _) = space_delimited(tag("("))(i0)?;
-    let (i, color) = space_delimited(vec3_expr)(i)?;
+    let (i, color) = space_delimited(vec3_ident_expr)(i)?;
     let (i, _) = space_delimited(tag(")"))(i)?;
     Ok((
         i,

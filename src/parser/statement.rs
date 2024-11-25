@@ -10,7 +10,7 @@ use nom::{
 
 use super::{
     calc_offset, close_brace,
-    expression::{expr, vec3_expr},
+    expression::{expr, vec3_expr, vec3_ident_expr},
     identifier,
     object::object,
     open_brace, space_delimited,
@@ -145,7 +145,7 @@ fn config_statement(i: Span) -> IResult<Span, Statement> {
         }
         let (i, attr) = opt(preceded(
             space_delimited(tag("sky_color:")),
-            pair(space_delimited(vec3_expr), space_delimited(tag(","))),
+            pair(space_delimited(vec3_ident_expr), space_delimited(tag(","))),
         ))(i)?;
         if let Some(attr) = attr {
             sky_color = Some(attr.0);

@@ -7,7 +7,7 @@ use crate::ast::{
     material::Material as MaterialAST, texture::Texture as TextureAST, ExprEnum, Expression,
 };
 use ray_tracer_rs::{
-    material::{Dielectric, Lambertian, Metal},
+    material::{Dielectric, DiffuseLight, Lambertian, Metal},
     texture::{Checker, NoiseTexture, SolidColor},
     vec3::Color,
 };
@@ -165,7 +165,7 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
                 let intensity = eval_expr(intensity, variables, funcs);
                 match (color, intensity) {
                     (Value::Vec3(r, g, b), Value::Num(intensity)) => {
-                        Value::Material(Rc::new(RefCell::new(Lambertian::new(Rc::new(
+                        Value::Material(Rc::new(RefCell::new(DiffuseLight::new(Rc::new(
                             SolidColor::new(Color::new(r, g, b) / COLOR_MAX * intensity),
                         )))))
                     }

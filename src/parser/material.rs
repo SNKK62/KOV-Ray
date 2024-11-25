@@ -1,6 +1,6 @@
 use super::{
     calc_offset,
-    expression::{expr, vec3_expr},
+    expression::{expr, vec3_ident_expr},
     space_delimited,
     texture::texture_expr,
 };
@@ -10,7 +10,7 @@ use nom::{branch::alt, bytes::complete::tag, IResult};
 fn metal_material(i: Span) -> IResult<Span, Expression> {
     let (i0, _) = space_delimited(tag("Metal"))(i)?;
     let (i, _) = space_delimited(tag("("))(i0)?;
-    let (i, color) = space_delimited(vec3_expr)(i)?;
+    let (i, color) = space_delimited(vec3_ident_expr)(i)?;
     let (i, _) = space_delimited(tag(","))(i)?;
     let (i, fuzz) = space_delimited(expr)(i)?;
     let (i, _) = space_delimited(tag(")"))(i)?;
@@ -54,7 +54,7 @@ fn lambertian_material(i: Span) -> IResult<Span, Expression> {
 fn light_material(i: Span) -> IResult<Span, Expression> {
     let (i0, _) = space_delimited(tag("Light"))(i)?;
     let (i, _) = space_delimited(tag("("))(i0)?;
-    let (i, color) = space_delimited(vec3_expr)(i)?;
+    let (i, color) = space_delimited(vec3_ident_expr)(i)?;
     let (i, _) = space_delimited(tag(","))(i)?;
     let (i, intensity) = space_delimited(expr)(i)?;
     let (i, _) = space_delimited(tag(")"))(i)?;

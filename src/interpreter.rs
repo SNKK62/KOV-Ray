@@ -87,7 +87,8 @@ fn get_rgb(color: &Color, samples_per_pixel: usize) -> (u8, u8, u8) {
 pub fn interpret(ast: &AST, show_progress: bool) -> (Vec<u8>, u32, u32) {
     let (mut world, config, camera) = eval_ast(ast);
     // TODO: apply motion blur
-    let bvh = BvhNode::new(&mut world, 0.0, 0.0);
+    let world = BvhNode::new(&mut world, 0.0, 0.0);
+
     let width = config.width.round() as u32;
     let height = config.height.round() as u32;
     let samples_per_pixel = config.samples_per_pixel.round() as usize;
@@ -109,8 +110,9 @@ pub fn interpret(ast: &AST, show_progress: bool) -> (Vec<u8>, u32, u32) {
             for _ in 0..samples_per_pixel {
                 let u = (i as f64 + rand::thread_rng().gen_range(0.0..1.0)) / (width - 1) as f64;
                 let v = (j as f64 + rand::thread_rng().gen_range(0.0..1.0)) / (height - 1) as f64;
+
                 let ray = camera.get_ray(u, v);
-                pixel_color += ray.color(&background, &bvh, max_depth);
+                pixel_color += ray.color(&background, &world, max_depth);
             }
             if show_progress {
                 pg.update();
