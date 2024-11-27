@@ -1,6 +1,14 @@
 use std::collections::HashMap;
 
+use rand::Rng;
+
 pub type Functions<'src> = HashMap<String, FnDecl>;
+
+fn noarg_fn(f: fn() -> f64) -> FnDecl {
+    FnDecl::Native(NativeFn {
+        code: Box::new(move |_| f()),
+    })
+}
 
 fn unary_fn(f: fn(f64) -> f64) -> FnDecl {
     FnDecl::Native(NativeFn {
@@ -36,6 +44,10 @@ pub fn standard_functions<'src>() -> Functions<'src> {
     funcs.insert("exp".to_string(), unary_fn(f64::exp));
     funcs.insert("log".to_string(), binary_fn(f64::log));
     funcs.insert("log10".to_string(), unary_fn(f64::log10));
+    funcs.insert(
+        "rand".to_string(),
+        noarg_fn(|| rand::thread_rng().gen_range(0.0..1.0)),
+    );
     funcs
 }
 
