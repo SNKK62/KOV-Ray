@@ -110,8 +110,8 @@ pub fn interpret(ast: &AST) -> (Vec<u8>, u32, u32) {
                     buf[((height - j - 1) * width * 3 + i * 3) as usize] = r;
                     buf[((height - j - 1) * width * 3 + i * 3 + 1) as usize] = g;
                     buf[((height - j - 1) * width * 3 + i * 3 + 2) as usize] = b;
-                    let mut pb = pg.write().unwrap();
-                    pb.update();
+                    let mut pg = pg.write().unwrap();
+                    pg.update();
                 }
             })
         })
