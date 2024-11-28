@@ -96,9 +96,9 @@ Box {
 
 ##### Output
 
-![Cornell Box](./images/cornell_box.png)
+![Cornell Box](./images/cornel_box.png)
 
-#### Random Spheres
+#### Random Balls
 
 <details>
 <summary>Scene description</summary>
@@ -195,7 +195,7 @@ Sphere {
 
 ##### Output
 
-![Random Spheres](./images/random_spheres.png)
+![Random Spheres](./images/random_balls.png)
 
 ## Syntax
 
