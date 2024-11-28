@@ -20,7 +20,7 @@ cargo run --release -- -o <output_path> <scene_file_path>
 <summary>Scene description</summary>
 <div>
 
-\```
+```
 Camera {
     lookfrom: <278, 278, -800>,
     lookat: <278, 278, 0>,
@@ -90,7 +90,7 @@ Box {
     rotateY: -18,
     translate: <130, 0, 65>,
 }
-\```
+```
 </div>
 </details>
 
