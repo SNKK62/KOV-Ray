@@ -27,6 +27,58 @@ fn object_statement(i0: Span) -> IResult<Span, Statement> {
         },
     ))
 }
+enum CameraConfigEnum<'a> {
+    Lookfrom(Expression<'a>),
+    Lookat(Expression<'a>),
+    Up(Expression<'a>),
+    Angle(Expression<'a>),
+    DistToFocus(Expression<'a>),
+}
+
+fn loockfrom_decl(i: Span) -> IResult<Span, CameraConfigEnum> {
+    let (i, expr) = delimited(
+        space_delimited(tag("lookfrom:")),
+        space_delimited(vec3_expr),
+        space_delimited(tag(",")),
+    )(i)?;
+    Ok((i, CameraConfigEnum::Lookfrom(expr)))
+}
+
+fn loockat_decl(i: Span) -> IResult<Span, CameraConfigEnum> {
+    let (i, expr) = delimited(
+        space_delimited(tag("lookat:")),
+        space_delimited(vec3_expr),
+        space_delimited(tag(",")),
+    )(i)?;
+    Ok((i, CameraConfigEnum::Lookat(expr)))
+}
+
+fn up_decl(i: Span) -> IResult<Span, CameraConfigEnum> {
+    let (i, expr) = delimited(
+        space_delimited(tag("up:")),
+        space_delimited(vec3_expr),
+        space_delimited(tag(",")),
+    )(i)?;
+    Ok((i, CameraConfigEnum::Up(expr)))
+}
+
+fn angle_decl(i: Span) -> IResult<Span, CameraConfigEnum> {
+    let (i, expr) = delimited(
+        space_delimited(tag("angle:")),
+        space_delimited(expr),
+        space_delimited(tag(",")),
+    )(i)?;
+    Ok((i, CameraConfigEnum::Angle(expr)))
+}
+
+fn dist_to_focus_decl(i: Span) -> IResult<Span, CameraConfigEnum> {
+    let (i, expr) = delimited(
+        space_delimited(tag("dist_to_focus:")),
+        space_delimited(expr),
+        space_delimited(tag(",")),
+    )(i)?;
+    Ok((i, CameraConfigEnum::DistToFocus(expr)))
+}
 
 fn camera_statement(i: Span) -> IResult<Span, Statement> {
     let (i, _) = space_delimited(tag("Camera"))(i)?;
@@ -38,72 +90,36 @@ fn camera_statement(i: Span) -> IResult<Span, Statement> {
     let mut angle: Option<Expression> = None;
     let mut dist_to_focus: Option<Expression> = None;
     let i0 = i;
-    let mut i_start = i;
-    loop {
-        let mut is_updated = false;
-        let (i, attr) = opt(preceded(
-            space_delimited(tag("lookfrom:")),
-            pair(space_delimited(vec3_expr), space_delimited(tag(","))),
-        ))(i_start)?;
-        if let Some(attr) = attr {
-            is_updated = true;
-            lookfrom = Some(attr.0);
-        }
-        let (i, attr) = opt(preceded(
-            space_delimited(tag("lookat:")),
-            pair(space_delimited(vec3_expr), space_delimited(tag(","))),
-        ))(i)?;
-        if let Some(attr) = attr {
-            is_updated = true;
-            lookat = Some(attr.0);
-        }
-        let (i, attr) = opt(preceded(
-            space_delimited(tag("up:")),
-            pair(space_delimited(vec3_expr), space_delimited(tag(","))),
-        ))(i)?;
-        if let Some(attr) = attr {
-            is_updated = true;
-            up = Some(attr.0);
-        }
-        let (i, attr) = opt(preceded(
-            space_delimited(tag("angle:")),
-            pair(space_delimited(expr), space_delimited(tag(","))),
-        ))(i)?;
-        if let Some(attr) = attr {
-            is_updated = true;
-            angle = Some(attr.0);
-        }
-        let (i, attr) = opt(preceded(
-            space_delimited(tag("dist_to_focus:")),
-            pair(space_delimited(expr), space_delimited(tag(","))),
-        ))(i)?;
-        if let Some(attr) = attr {
-            is_updated = true;
-            dist_to_focus = Some(attr.0);
-        }
-        let (i, res) = opt(space_delimited(close_brace))(i)?;
-        i_start = i;
-        if res.is_some() {
-            break;
-        }
-        if !is_updated {
-            return Err(nom::Err::Error(nom::error::Error {
-                input: i_start,
-                code: nom::error::ErrorKind::Tag,
-            }));
-        }
-    }
+
+    let (i, p) = many0(alt((
+        loockfrom_decl,
+        loockat_decl,
+        up_decl,
+        angle_decl,
+        dist_to_focus_decl,
+    )))(i)?;
+
+    p.iter().for_each(|v| match v {
+        CameraConfigEnum::Lookfrom(expr) => lookfrom = Some(expr.clone()),
+        CameraConfigEnum::Lookat(expr) => lookat = Some(expr.clone()),
+        CameraConfigEnum::Up(expr) => up = Some(expr.clone()),
+        CameraConfigEnum::Angle(expr) => angle = Some(expr.clone()),
+        CameraConfigEnum::DistToFocus(expr) => dist_to_focus = Some(expr.clone()),
+    });
 
     if lookfrom.is_none() || lookat.is_none() || angle.is_none() {
         return Err(nom::Err::Error(nom::error::Error {
-            input: i_start,
+            input: i,
             code: nom::error::ErrorKind::Tag,
         }));
     }
+
+    let (i, _) = space_delimited(close_brace)(i)?;
+
     Ok((
-        i_start,
+        i,
         (Statement::Camera {
-            span: calc_offset(i0, i_start),
+            span: calc_offset(i0, i),
             config: CameraConfig {
                 lookfrom: lookfrom.unwrap(),
                 lookat: lookat.unwrap(),
@@ -115,7 +131,62 @@ fn camera_statement(i: Span) -> IResult<Span, Statement> {
     ))
 }
 
+#[derive(Debug)]
+enum ConfigEnum<'a> {
+    Width(Expression<'a>),
+    Height(Expression<'a>),
+    SamplesPerPixel(Expression<'a>),
+    MaxDepth(Expression<'a>),
+    SkyColor(Expression<'a>),
+}
+
+fn width_decl(i: Span) -> IResult<Span, ConfigEnum> {
+    let (i, expr) = delimited(
+        space_delimited(tag("width:")),
+        space_delimited(expr),
+        space_delimited(tag(",")),
+    )(i)?;
+    Ok((i, ConfigEnum::Width(expr)))
+}
+
+fn height_decl(i: Span) -> IResult<Span, ConfigEnum> {
+    let (i, expr) = delimited(
+        space_delimited(tag("height:")),
+        space_delimited(expr),
+        space_delimited(tag(",")),
+    )(i)?;
+    Ok((i, ConfigEnum::Height(expr)))
+}
+
+fn samples_per_pixel_decl(i: Span) -> IResult<Span, ConfigEnum> {
+    let (i, expr) = delimited(
+        space_delimited(tag("samples_per_pixel:")),
+        space_delimited(expr),
+        space_delimited(tag(",")),
+    )(i)?;
+    Ok((i, ConfigEnum::SamplesPerPixel(expr)))
+}
+
+fn max_depth_decl(i: Span) -> IResult<Span, ConfigEnum> {
+    let (i, expr) = delimited(
+        space_delimited(tag("max_depth:")),
+        space_delimited(expr),
+        space_delimited(tag(",")),
+    )(i)?;
+    Ok((i, ConfigEnum::MaxDepth(expr)))
+}
+
+fn sky_color_decl(i: Span) -> IResult<Span, ConfigEnum> {
+    let (i, expr) = delimited(
+        space_delimited(tag("sky_color:")),
+        space_delimited(vec3_ident_expr),
+        space_delimited(tag(",")),
+    )(i)?;
+    Ok((i, ConfigEnum::SkyColor(expr)))
+}
+
 fn config_statement(i: Span) -> IResult<Span, Statement> {
+    println!("{:?}", i);
     let (i, _) = space_delimited(tag("Config"))(i)?;
     let (i, _) = space_delimited(open_brace)(i)?;
 
@@ -125,72 +196,36 @@ fn config_statement(i: Span) -> IResult<Span, Statement> {
     let mut max_depth: Option<Expression> = None;
     let mut sky_color: Option<Expression> = None;
     let i0 = i;
-    let mut i_start = i;
-    loop {
-        let mut is_updated = false;
-        let (i, attr) = opt(preceded(
-            space_delimited(tag("width:")),
-            pair(space_delimited(expr), space_delimited(tag(","))),
-        ))(i_start)?;
-        if let Some(attr) = attr {
-            is_updated = true;
-            width = Some(attr.0);
-        }
-        let (i, attr) = opt(preceded(
-            space_delimited(tag("height:")),
-            pair(space_delimited(expr), space_delimited(tag(","))),
-        ))(i)?;
-        if let Some(attr) = attr {
-            is_updated = true;
-            height = Some(attr.0);
-        }
-        let (i, attr) = opt(preceded(
-            space_delimited(tag("samples_per_pixel:")),
-            pair(space_delimited(expr), space_delimited(tag(","))),
-        ))(i)?;
-        if let Some(attr) = attr {
-            is_updated = true;
-            samples_per_pixel = Some(attr.0);
-        }
-        let (i, attr) = opt(preceded(
-            space_delimited(tag("max_depth:")),
-            pair(space_delimited(expr), space_delimited(tag(","))),
-        ))(i)?;
-        if let Some(attr) = attr {
-            is_updated = true;
-            max_depth = Some(attr.0);
-        }
-        let (i, attr) = opt(preceded(
-            space_delimited(tag("sky_color:")),
-            pair(space_delimited(vec3_ident_expr), space_delimited(tag(","))),
-        ))(i)?;
-        if let Some(attr) = attr {
-            is_updated = true;
-            sky_color = Some(attr.0);
-        }
-        let (i, res) = opt(space_delimited(close_brace))(i)?;
-        i_start = i;
-        if res.is_some() {
-            break;
-        }
-        if !is_updated {
-            return Err(nom::Err::Error(nom::error::Error {
-                input: i_start,
-                code: nom::error::ErrorKind::Tag,
-            }));
-        }
-    }
+
+    let (i, p) = many0(alt((
+        width_decl,
+        height_decl,
+        samples_per_pixel_decl,
+        max_depth_decl,
+        sky_color_decl,
+    )))(i)?;
+
+    p.iter().for_each(|v| match v {
+        ConfigEnum::Width(expr) => width = Some(expr.clone()),
+        ConfigEnum::Height(expr) => height = Some(expr.clone()),
+        ConfigEnum::SamplesPerPixel(expr) => samples_per_pixel = Some(expr.clone()),
+        ConfigEnum::MaxDepth(expr) => max_depth = Some(expr.clone()),
+        ConfigEnum::SkyColor(expr) => sky_color = Some(expr.clone()),
+    });
 
     if samples_per_pixel.is_none() || width.is_none() || height.is_none() {
         return Err(nom::Err::Error(nom::error::Error {
-            input: i_start,
+            input: i,
             code: nom::error::ErrorKind::Tag,
         }));
     }
+
+    let (i, _) = space_delimited(close_brace)(i)?;
+
     Ok((
-        i_start,
+        i,
         (Statement::Config {
-            span: calc_offset(i0, i_start),
+            span: calc_offset(i0, i),
             config: Config {
                 width: width.unwrap(),
                 height: height.unwrap(),
