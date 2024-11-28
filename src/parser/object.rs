@@ -21,6 +21,7 @@ use std::{cell::RefCell, rc::Rc};
 fn affine_properties<'a>(
     i: Span<'a>,
     properties: &Rc<RefCell<Vec<AffineProperties<'a>>>>,
+    is_updated: &mut bool,
     // properties: &mut std::cell::RefMut<AffineProperties<'a>>,
 ) -> IResult<Span<'a>, ()> {
     let (i, attr) = opt(preceded(
@@ -28,6 +29,7 @@ fn affine_properties<'a>(
         pair(space_delimited(vec3_expr), space_delimited(tag(","))),
     ))(i)?;
     if let Some(attr) = attr {
+        *is_updated = true;
         properties
             .borrow_mut()
             .push(AffineProperties::Translation(attr.0));
@@ -37,6 +39,7 @@ fn affine_properties<'a>(
         pair(space_delimited(expr), space_delimited(tag(","))),
     ))(i)?;
     if let Some(attr) = attr {
+        *is_updated = true;
         properties
             .borrow_mut()
             .push(AffineProperties::Rotate(Rotate {
@@ -49,6 +52,7 @@ fn affine_properties<'a>(
         pair(space_delimited(expr), space_delimited(tag(","))),
     ))(i)?;
     if let Some(attr) = attr {
+        *is_updated = true;
         properties
             .borrow_mut()
             .push(AffineProperties::Rotate(Rotate {
@@ -61,6 +65,7 @@ fn affine_properties<'a>(
         pair(space_delimited(expr), space_delimited(tag(","))),
     ))(i)?;
     if let Some(attr) = attr {
+        *is_updated = true;
         properties
             .borrow_mut()
             .push(AffineProperties::Rotate(Rotate {
@@ -79,11 +84,18 @@ fn objects(i: Span) -> IResult<Span, Object> {
     let affine: Rc<RefCell<Vec<AffineProperties>>> = Rc::new(RefCell::new(Vec::new()));
     let mut i_start = i;
     loop {
-        let (i, _) = affine_properties(i_start, &affine)?;
+        let mut is_updated = false;
+        let (i, _) = affine_properties(i_start, &affine, &mut is_updated)?;
         let (i, res) = opt(space_delimited(close_brace))(i)?;
         i_start = i;
         if res.is_some() {
             break;
+        }
+        if !is_updated {
+            return Err(nom::Err::Error(nom::error::Error {
+                input: i_start,
+                code: nom::error::ErrorKind::Tag,
+            }));
         }
     }
     let affine = affine.borrow().clone();
@@ -101,11 +113,13 @@ fn sphere_object(i: Span) -> IResult<Span, Object> {
 
     let mut i_start = i;
     loop {
+        let mut is_updated = false;
         let (i, attr) = opt(preceded(
             space_delimited(tag("center:")),
             pair(space_delimited(vec3_expr), space_delimited(tag(","))),
         ))(i_start)?;
         if let Some(attr) = attr {
+            is_updated = true;
             center = Some(attr.0);
         }
         let (i, attr) = opt(preceded(
@@ -113,6 +127,7 @@ fn sphere_object(i: Span) -> IResult<Span, Object> {
             pair(space_delimited(expr), space_delimited(tag(","))),
         ))(i)?;
         if let Some(attr) = attr {
+            is_updated = true;
             radius = Some(attr.0);
         }
         let (i, attr) = opt(preceded(
@@ -120,13 +135,20 @@ fn sphere_object(i: Span) -> IResult<Span, Object> {
             pair(space_delimited(material_expr), space_delimited(tag(","))),
         ))(i)?;
         if let Some(attr) = attr {
+            is_updated = true;
             material = Some(attr.0);
         }
-        let (i, _) = affine_properties(i, &affine)?;
+        let (i, _) = affine_properties(i, &affine, &mut is_updated)?;
         let (i, res) = opt(space_delimited(close_brace))(i)?;
         i_start = i;
         if res.is_some() {
             break;
+        }
+        if !is_updated {
+            return Err(nom::Err::Error(nom::error::Error {
+                input: i_start,
+                code: nom::error::ErrorKind::Tag,
+            }));
         }
     }
 
@@ -163,6 +185,7 @@ fn general_square_object_properties(i: Span) -> IResult<Span, SquareObjectProper
 
     let mut i_start = i;
     loop {
+        let mut is_updated = false;
         let (i, attr) = opt(preceded(
             space_delimited(tag("vertex:")),
             tuple((
@@ -175,6 +198,7 @@ fn general_square_object_properties(i: Span) -> IResult<Span, SquareObjectProper
             )),
         ))(i_start)?;
         if let Some(attr) = attr {
+            is_updated = true;
             vertex = Some((attr.1, attr.3));
         }
         let (i, attr) = opt(preceded(
@@ -182,9 +206,10 @@ fn general_square_object_properties(i: Span) -> IResult<Span, SquareObjectProper
             pair(space_delimited(material_expr), space_delimited(tag(","))),
         ))(i)?;
         if let Some(attr) = attr {
+            is_updated = true;
             material = Some(attr.0);
         }
-        let (i, _) = affine_properties(i, &affine)?;
+        let (i, _) = affine_properties(i, &affine, &mut is_updated)?;
         let (i, res) = opt(space_delimited(close_brace))(i)?;
         i_start = i;
         if res.is_some() {

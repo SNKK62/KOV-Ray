@@ -16,7 +16,7 @@ fn main() {
     if args.show_ast {
         println!("{:#?}", ast);
     }
-    let (image_buffer, width, height) = interpret(&ast, true);
+    let (image_buffer, width, height) = interpret(&ast);
     let img = RgbImage::from_raw(width, height, image_buffer).expect("incorrect image buffer size");
 
     img.save(output).expect("failed to save image");

@@ -10,13 +10,14 @@ use ray_tracer_rs::{
     hittable::Hittable,
     vec3::{Color, Vec3},
 };
-use std::rc::Rc;
+
+use std::sync::Arc;
 
 pub(super) fn eval_stmt<'a>(
     ast: &Statement<'a>,
     variables: &mut Variables,
     funcs: &Functions<'a>,
-    world: &mut Vec<Rc<dyn Hittable>>,
+    world: &mut Vec<Arc<dyn Hittable>>,
     config: &mut Option<ConfigValue>,
     camera_config: &mut Option<CameraConfigValue>,
 ) {

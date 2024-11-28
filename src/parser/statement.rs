@@ -40,11 +40,13 @@ fn camera_statement(i: Span) -> IResult<Span, Statement> {
     let i0 = i;
     let mut i_start = i;
     loop {
+        let mut is_updated = false;
         let (i, attr) = opt(preceded(
             space_delimited(tag("lookfrom:")),
             pair(space_delimited(vec3_expr), space_delimited(tag(","))),
         ))(i_start)?;
         if let Some(attr) = attr {
+            is_updated = true;
             lookfrom = Some(attr.0);
         }
         let (i, attr) = opt(preceded(
@@ -52,6 +54,7 @@ fn camera_statement(i: Span) -> IResult<Span, Statement> {
             pair(space_delimited(vec3_expr), space_delimited(tag(","))),
         ))(i)?;
         if let Some(attr) = attr {
+            is_updated = true;
             lookat = Some(attr.0);
         }
         let (i, attr) = opt(preceded(
@@ -59,6 +62,7 @@ fn camera_statement(i: Span) -> IResult<Span, Statement> {
             pair(space_delimited(vec3_expr), space_delimited(tag(","))),
         ))(i)?;
         if let Some(attr) = attr {
+            is_updated = true;
             up = Some(attr.0);
         }
         let (i, attr) = opt(preceded(
@@ -66,6 +70,7 @@ fn camera_statement(i: Span) -> IResult<Span, Statement> {
             pair(space_delimited(expr), space_delimited(tag(","))),
         ))(i)?;
         if let Some(attr) = attr {
+            is_updated = true;
             angle = Some(attr.0);
         }
         let (i, attr) = opt(preceded(
@@ -73,12 +78,19 @@ fn camera_statement(i: Span) -> IResult<Span, Statement> {
             pair(space_delimited(expr), space_delimited(tag(","))),
         ))(i)?;
         if let Some(attr) = attr {
+            is_updated = true;
             dist_to_focus = Some(attr.0);
         }
         let (i, res) = opt(space_delimited(close_brace))(i)?;
         i_start = i;
         if res.is_some() {
             break;
+        }
+        if !is_updated {
+            return Err(nom::Err::Error(nom::error::Error {
+                input: i_start,
+                code: nom::error::ErrorKind::Tag,
+            }));
         }
     }
 
@@ -115,11 +127,13 @@ fn config_statement(i: Span) -> IResult<Span, Statement> {
     let i0 = i;
     let mut i_start = i;
     loop {
+        let mut is_updated = false;
         let (i, attr) = opt(preceded(
             space_delimited(tag("width:")),
             pair(space_delimited(expr), space_delimited(tag(","))),
         ))(i_start)?;
         if let Some(attr) = attr {
+            is_updated = true;
             width = Some(attr.0);
         }
         let (i, attr) = opt(preceded(
@@ -127,6 +141,7 @@ fn config_statement(i: Span) -> IResult<Span, Statement> {
             pair(space_delimited(expr), space_delimited(tag(","))),
         ))(i)?;
         if let Some(attr) = attr {
+            is_updated = true;
             height = Some(attr.0);
         }
         let (i, attr) = opt(preceded(
@@ -134,6 +149,7 @@ fn config_statement(i: Span) -> IResult<Span, Statement> {
             pair(space_delimited(expr), space_delimited(tag(","))),
         ))(i)?;
         if let Some(attr) = attr {
+            is_updated = true;
             samples_per_pixel = Some(attr.0);
         }
         let (i, attr) = opt(preceded(
@@ -141,6 +157,7 @@ fn config_statement(i: Span) -> IResult<Span, Statement> {
             pair(space_delimited(expr), space_delimited(tag(","))),
         ))(i)?;
         if let Some(attr) = attr {
+            is_updated = true;
             max_depth = Some(attr.0);
         }
         let (i, attr) = opt(preceded(
@@ -148,12 +165,19 @@ fn config_statement(i: Span) -> IResult<Span, Statement> {
             pair(space_delimited(vec3_ident_expr), space_delimited(tag(","))),
         ))(i)?;
         if let Some(attr) = attr {
+            is_updated = true;
             sky_color = Some(attr.0);
         }
         let (i, res) = opt(space_delimited(close_brace))(i)?;
         i_start = i;
         if res.is_some() {
             break;
+        }
+        if !is_updated {
+            return Err(nom::Err::Error(nom::error::Error {
+                input: i_start,
+                code: nom::error::ErrorKind::Tag,
+            }));
         }
     }
 

@@ -8,7 +8,7 @@ use nom::{
     sequence::{delimited, pair},
     IResult, InputTake, Offset, Parser,
 };
-use std::{collections::HashMap, error::Error};
+use std::error::Error;
 
 use crate::ast::{Span, AST};
 mod expression;

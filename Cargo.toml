@@ -8,6 +8,6 @@ image = "0.25.5"
 nom = "7.1.3"
 nom_locate = "4.2.0"
 rand = "0.8.5"
-ray-tracer-rs = {git = "https://github.com/SNKK62/toy-ray-tracer-rs", rev = "73be1917b0a28ad218e591128f76bdc3056fff81"}
+ray-tracer-rs = {git = "https://github.com/SNKK62/toy-ray-tracer-rs", rev = "4bd20e4"}
 pg-indicator = {git = "https://github.com/SNKK62/pg-indicator-rs", rev = "26e14d1f02f3fbca623ad617fc4d6dacb01a22aa"}
 

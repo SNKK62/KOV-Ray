@@ -12,7 +12,7 @@ use ray_tracer_rs::{
     vec3::Color,
 };
 
-use std::{cell::RefCell, rc::Rc};
+use std::sync::{Arc, RwLock};
 
 pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Functions) -> Value {
     match &ast.expr {
@@ -136,7 +136,7 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
                 let texture = eval_expr(texture, variables, funcs);
                 match texture {
                     Value::Texture(texture) => {
-                        Value::Material(Rc::new(RefCell::new(Lambertian::new(texture))))
+                        Value::Material(Arc::new(RwLock::new(Lambertian::new(texture))))
                     }
                     _ => panic!("Invalid texture type"),
                 }
@@ -145,8 +145,8 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
                 let color = eval_expr(color, variables, funcs);
                 let fuzz = eval_expr(fuzz, variables, funcs);
                 match (color, fuzz) {
-                    (Value::Vec3(r, g, b), Value::Num(fuzz)) => Value::Material(Rc::new(
-                        RefCell::new(Metal::new(&(Color::new(r, g, b) / COLOR_MAX), fuzz)),
+                    (Value::Vec3(r, g, b), Value::Num(fuzz)) => Value::Material(Arc::new(
+                        RwLock::new(Metal::new(&(Color::new(r, g, b) / COLOR_MAX), fuzz)),
                     )),
                     _ => panic!("Invalid color or fuzz type"),
                 }
@@ -155,7 +155,7 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
                 let reflection_index = eval_expr(reflection_index, variables, funcs);
                 match reflection_index {
                     Value::Num(reflection_index) => {
-                        Value::Material(Rc::new(RefCell::new(Dielectric::new(reflection_index))))
+                        Value::Material(Arc::new(RwLock::new(Dielectric::new(reflection_index))))
                     }
                     _ => panic!("Invalid reflection index type"),
                 }
@@ -165,7 +165,7 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
                 let intensity = eval_expr(intensity, variables, funcs);
                 match (color, intensity) {
                     (Value::Vec3(r, g, b), Value::Num(intensity)) => {
-                        Value::Material(Rc::new(RefCell::new(DiffuseLight::new(Rc::new(
+                        Value::Material(Arc::new(RwLock::new(DiffuseLight::new(Arc::new(
                             SolidColor::new(Color::new(r, g, b) / COLOR_MAX * intensity),
                         )))))
                     }
@@ -178,7 +178,7 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
                 let color = eval_expr(color, variables, funcs);
                 match color {
                     Value::Vec3(r, g, b) => {
-                        Value::Texture(Rc::new(SolidColor::new(Color::new(r, g, b) / COLOR_MAX)))
+                        Value::Texture(Arc::new(SolidColor::new(Color::new(r, g, b) / COLOR_MAX)))
                     }
                     _ => panic!("Invalid color type"),
                 }
@@ -188,7 +188,7 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
                 let even = eval_expr(even, variables, funcs);
                 match (odd, even) {
                     (Value::Texture(odd), Value::Texture(even)) => {
-                        Value::Texture(Rc::new(Checker::new(odd, even)))
+                        Value::Texture(Arc::new(Checker::new(odd, even)))
                     }
                     _ => panic!("Invalid checker type"),
                 }
@@ -196,7 +196,7 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
             TextureAST::Perlin(scale) => {
                 let scale = eval_expr(scale, variables, funcs);
                 match scale {
-                    Value::Num(scale) => Value::Texture(Rc::new(NoiseTexture::new(scale))),
+                    Value::Num(scale) => Value::Texture(Arc::new(NoiseTexture::new(scale))),
                     _ => panic!("Invalid scale type"),
                 }
             }

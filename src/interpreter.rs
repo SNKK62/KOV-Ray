@@ -17,13 +17,18 @@ use ray_tracer_rs::{
     hittable::{BvhNode, Hittable},
     vec3::Color,
 };
-use std::{collections::HashMap, rc::Rc};
+use std::{
+    collections::HashMap,
+    sync::{Arc, RwLock},
+    thread,
+    time::Instant,
+};
 
 type Variables = HashMap<String, value::Value>;
 
 const COLOR_MAX: f64 = 255.0;
 
-fn eval_ast(ast: &AST) -> (Vec<Rc<dyn Hittable>>, ConfigValue, Camera) {
+fn eval_ast(ast: &AST) -> (Vec<Arc<dyn Hittable>>, ConfigValue, Camera) {
     let mut world = Vec::new();
     let mut config = None;
     let mut camera_config = None;
@@ -63,31 +68,10 @@ fn eval_ast(ast: &AST) -> (Vec<Rc<dyn Hittable>>, ConfigValue, Camera) {
     (world, config, camera)
 }
 
-fn clamp(x: f64, min: f64, max: f64) -> f64 {
-    if x < min {
-        return min;
-    }
-    if x > max {
-        return max;
-    }
-    x
-}
-
-fn get_rgb(color: &Color, samples_per_pixel: usize) -> (u8, u8, u8) {
-    let scale = 1.0 / samples_per_pixel as f64;
-    let min = 0.0;
-    let max = 0.999;
-    // gamma correction
-    let r = (255.999 * clamp((color.x() * scale).sqrt(), min, max)).round() as u8;
-    let g = (255.999 * clamp((color.y() * scale).sqrt(), min, max)).round() as u8;
-    let b = (255.999 * clamp((color.z() * scale).sqrt(), min, max)).round() as u8;
-    (r, g, b)
-}
-
-pub fn interpret(ast: &AST, show_progress: bool) -> (Vec<u8>, u32, u32) {
+pub fn interpret(ast: &AST) -> (Vec<u8>, u32, u32) {
     let (mut world, config, camera) = eval_ast(ast);
     // TODO: apply motion blur
-    let world = BvhNode::new(&mut world, 0.0, 0.0);
+    let world = Arc::new(BvhNode::new(&mut world, 0.0, 0.0));
 
     let width = config.width.round() as u32;
     let height = config.height.round() as u32;
@@ -95,32 +79,53 @@ pub fn interpret(ast: &AST, show_progress: bool) -> (Vec<u8>, u32, u32) {
     let max_depth = config.max_depth.round() as usize;
     let background = config.background;
 
-    // image buffer (1d flatten array of rgb values)
-    let mut buffer: Vec<u8> = Vec::new();
-
-    let mut pg = ProgressBar::new(
+    let pg = Arc::new(RwLock::new(ProgressBar::new(
         (width * height) as usize,
         PGStyle::Fraction,
         PGOutput::Stdout,
-    );
+    )));
+    let camera = Arc::new(camera);
 
-    for j in (0..height).rev() {
-        for i in 0..width {
-            let mut pixel_color = Color::zero();
-            for _ in 0..samples_per_pixel {
-                let u = (i as f64 + rand::thread_rng().gen_range(0.0..1.0)) / (width - 1) as f64;
-                let v = (j as f64 + rand::thread_rng().gen_range(0.0..1.0)) / (height - 1) as f64;
+    // image buffer (1d flatten array of rgb values)
+    let buffer = Arc::new(RwLock::new(vec![0; (width * height * 3) as usize]));
+    let handles: Vec<_> = (0..height)
+        .map(|j| {
+            let buffer = Arc::clone(&buffer);
+            let world = Arc::clone(&world);
+            let camera = Arc::clone(&camera);
+            let pg = Arc::clone(&pg);
 
-                let ray = camera.get_ray(u, v);
-                pixel_color += ray.color(&background, &world, max_depth);
-            }
-            if show_progress {
-                pg.update();
-            }
-            let (r, g, b) = get_rgb(&pixel_color, samples_per_pixel);
-            buffer.extend_from_slice(&[r, g, b]);
-        }
+            thread::spawn(move || {
+                let mut rng = rand::thread_rng();
+                for i in 0..width {
+                    let mut pixel_color = Color::zero();
+                    for _ in 0..samples_per_pixel {
+                        let u = (i as f64 + rng.gen_range(0.0..1.0)) / (width - 1) as f64;
+                        let v = (j as f64 + rng.gen_range(0.0..1.0)) / (height - 1) as f64;
+                        let ray = camera.get_ray(u, v);
+                        pixel_color += ray.color(&background, &*world, max_depth);
+                    }
+                    let mut buf = buffer.write().unwrap();
+                    let (r, g, b) = pixel_color.get_color(samples_per_pixel as i64);
+                    buf[((height - j - 1) * width * 3 + i * 3) as usize] = r;
+                    buf[((height - j - 1) * width * 3 + i * 3 + 1) as usize] = g;
+                    buf[((height - j - 1) * width * 3 + i * 3 + 2) as usize] = b;
+                    let mut pb = pg.write().unwrap();
+                    pb.update();
+                }
+            })
+        })
+        .collect();
+
+    let start = Instant::now();
+    for handle in handles {
+        handle.join().unwrap();
     }
-
-    (buffer, width, height)
+    let duration = start.elapsed();
+    println!("Time elapsed in expensive_function() is: {:?}", duration);
+    (
+        Arc::try_unwrap(buffer).unwrap().into_inner().unwrap(),
+        width,
+        height,
+    )
 }

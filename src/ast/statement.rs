@@ -34,19 +34,3 @@ pub enum Statement<'src> {
         config: Config<'src>,
     },
 }
-
-impl<'src> Statement<'src> {
-    pub(super) fn span(&self) -> Option<Span<'src>> {
-        use Statement::*;
-        Some(match self {
-            Expression(ex) => ex.span,
-            VarAssign { span, .. } => *span,
-            If { span, .. } => *span,
-            While { span, .. } => *span,
-            Object { span, .. } => *span,
-            Camera { span, .. } => *span,
-            Config { span, .. } => *span,
-            Break | Continue => return None,
-        })
-    }
-}

@@ -10,15 +10,15 @@ use ray_tracer_rs::{
     },
     vec3::Vec3,
 };
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub(super) fn eval_object(
     object: &Object,
     variables: &mut Variables,
     funcs: &Functions,
-    world: &mut Vec<Rc<dyn Hittable>>,
+    world: &mut Vec<Arc<dyn Hittable>>,
 ) {
-    let (mut obj, affine): (Rc<dyn Hittable>, &Vec<AffineProperties>) = match object {
+    let (mut obj, affine): (Arc<dyn Hittable>, &Vec<AffineProperties>) = match object {
         Object::Sphere {
             center,
             radius,
@@ -36,7 +36,7 @@ pub(super) fn eval_object(
                 Value::Material(material) => material,
                 _ => panic!("Invalid arguments for Sphere"),
             };
-            (Rc::new(Sphere::new(&center, radius, material)), affine)
+            (Arc::new(Sphere::new(&center, radius, material)), affine)
         }
         Object::Box {
             vertex,
@@ -56,7 +56,7 @@ pub(super) fn eval_object(
                 Value::Material(material) => material,
                 _ => panic!("Invalid arguments for Box"),
             };
-            (Rc::new(Cuboid::new(&vertex1, &vertex2, material)), affine)
+            (Arc::new(Cuboid::new(&vertex1, &vertex2, material)), affine)
         }
         Object::Plane {
             vertex,
@@ -76,8 +76,8 @@ pub(super) fn eval_object(
                 Value::Material(material) => material,
                 _ => panic!("Invalid arguments for Plane"),
             };
-            let rect: Rc<dyn Hittable> = if vertex1.x() == vertex2.x() {
-                Rc::new(YZRect::new(
+            let rect: Arc<dyn Hittable> = if vertex1.x() == vertex2.x() {
+                Arc::new(YZRect::new(
                     vertex1.y(),
                     vertex2.y(),
                     vertex1.z(),
@@ -86,7 +86,7 @@ pub(super) fn eval_object(
                     material,
                 ))
             } else if vertex1.y() == vertex2.y() {
-                Rc::new(XZRect::new(
+                Arc::new(XZRect::new(
                     vertex1.x(),
                     vertex2.x(),
                     vertex1.z(),
@@ -95,7 +95,7 @@ pub(super) fn eval_object(
                     material,
                 ))
             } else if vertex1.z() == vertex2.z() {
-                Rc::new(XYRect::new(
+                Arc::new(XYRect::new(
                     vertex1.x(),
                     vertex2.x(),
                     vertex1.y(),
@@ -114,7 +114,7 @@ pub(super) fn eval_object(
                 eval_object(obj, variables, funcs, &mut objs);
             }
             // TODO: apply motion blur
-            (Rc::new(BvhNode::new(&mut objs, 0.0, 0.0)), affine)
+            (Arc::new(BvhNode::new(&mut objs, 0.0, 0.0)), affine)
         }
     };
     for af in affine.iter() {
@@ -124,7 +124,7 @@ pub(super) fn eval_object(
                     Value::Vec3(x, y, z) => Vec3::new(x, y, z),
                     _ => panic!("Invalid arguments for Sphere"),
                 };
-                obj = Rc::new(Translation::new(obj, offset));
+                obj = Arc::new(Translation::new(obj, offset));
             }
             AffineProperties::Rotate(rotate) => {
                 let angle = match eval_expr(&rotate.expr, variables, funcs) {
@@ -132,9 +132,9 @@ pub(super) fn eval_object(
                     _ => panic!("Invalid arguments for Rotate"),
                 };
                 obj = match rotate.axis {
-                    RotateAxis::X => Rc::new(RotateX::new(obj, angle)),
-                    RotateAxis::Y => Rc::new(RotateY::new(obj, angle)),
-                    RotateAxis::Z => Rc::new(RotateZ::new(obj, angle)),
+                    RotateAxis::X => Arc::new(RotateX::new(obj, angle)),
+                    RotateAxis::Y => Arc::new(RotateY::new(obj, angle)),
+                    RotateAxis::Z => Arc::new(RotateZ::new(obj, angle)),
                 };
             }
         }
