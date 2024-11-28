@@ -1,6 +1,6 @@
 use super::{
     close_brace,
-    expression::{expr, vec3_expr},
+    expression::{comment_expr, expr, vec3_ident_expr},
     material::material_expr,
     open_brace, space_delimited,
 };
@@ -11,6 +11,7 @@ use crate::ast::{
 use nom::{
     branch::alt,
     bytes::complete::tag,
+    combinator::opt,
     multi::{many0, many1},
     sequence::delimited,
     IResult,
@@ -19,9 +20,10 @@ use nom::{
 fn translate_decl(i: Span) -> IResult<Span, AffineProperties> {
     let (i, expr) = delimited(
         space_delimited(tag("translate:")),
-        space_delimited(vec3_expr),
+        space_delimited(vec3_ident_expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, AffineProperties::Translation(expr)))
 }
 
@@ -98,9 +100,10 @@ fn objects(i: Span) -> IResult<Span, Object> {
 fn sphere_center_decl(i: Span) -> IResult<Span, (&str, Expression)> {
     let (i, expr) = delimited(
         space_delimited(tag("center:")),
-        space_delimited(vec3_expr),
+        space_delimited(vec3_ident_expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, ("center", expr)))
 }
 
@@ -110,6 +113,7 @@ fn sphere_radius_decl(i: Span) -> IResult<Span, (&str, Expression)> {
         space_delimited(expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, ("radius", expr)))
 }
 
@@ -119,6 +123,7 @@ fn material_decl(i: Span) -> IResult<Span, (&str, Expression)> {
         space_delimited(material_expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, ("material", expr)))
 }
 
@@ -179,14 +184,15 @@ fn vertex_decl(i: Span) -> IResult<Span, SquareObjectPropertiesEnum> {
         space_delimited(tag("vertex:")),
         space_delimited(|i| {
             let (i, _) = tag("(")(i)?;
-            let (i, v1) = vec3_expr(i)?;
+            let (i, v1) = vec3_ident_expr(i)?;
             let (i, _) = tag(",")(i)?;
-            let (i, v2) = vec3_expr(i)?;
+            let (i, v2) = vec3_ident_expr(i)?;
             let (i, _) = tag(")")(i)?;
             Ok((i, (v1, v2)))
         }),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, SquareObjectPropertiesEnum::Vertex((expr.0, expr.1))))
 }
 
@@ -196,6 +202,7 @@ fn square_material_decl(i: Span) -> IResult<Span, SquareObjectPropertiesEnum> {
         space_delimited(material_expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, SquareObjectPropertiesEnum::Material(expr)))
 }
 

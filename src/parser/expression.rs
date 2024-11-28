@@ -2,7 +2,7 @@ use super::{calc_offset, identifier, space_delimited};
 use crate::ast::{ExprEnum, Expression, Span};
 use nom::{
     branch::alt,
-    bytes::complete::tag,
+    bytes::complete::{tag, take_until},
     character::complete::{char, multispace0, none_of},
     combinator::{cut, opt},
     multi::{fold_many0, many0},
@@ -178,4 +178,10 @@ pub(super) fn vec3_expr(i0: Span) -> IResult<Span, Expression> {
 
 pub(super) fn vec3_ident_expr(i: Span) -> IResult<Span, Expression> {
     alt((vec3_expr, ident))(i)
+}
+
+pub fn comment_expr(i: Span) -> IResult<Span, Expression> {
+    let (i, _) = space_delimited(tag("//"))(i)?;
+    let (i, _) = take_until("\n")(i)?;
+    Ok((i, Expression::new(ExprEnum::NumLiteral(0.0), i)))
 }

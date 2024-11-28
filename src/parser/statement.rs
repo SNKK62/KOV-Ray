@@ -1,6 +1,6 @@
 use nom::{
     branch::alt,
-    bytes::complete::{tag, take_until},
+    bytes::complete::tag,
     character::complete::{char, multispace0},
     combinator::{cut, map_res, opt},
     multi::many0,
@@ -10,12 +10,12 @@ use nom::{
 
 use super::{
     calc_offset, close_brace,
-    expression::{expr, vec3_expr, vec3_ident_expr},
+    expression::{comment_expr, expr, vec3_ident_expr},
     identifier,
     object::object,
     open_brace, space_delimited,
 };
-use crate::ast::{CameraConfig, Config, ExprEnum, Expression, Span, Statement, AST};
+use crate::ast::{CameraConfig, Config, Expression, Span, Statement, AST};
 
 fn object_statement(i0: Span) -> IResult<Span, Statement> {
     let (i, object) = object(i0)?;
@@ -38,27 +38,30 @@ enum CameraConfigEnum<'a> {
 fn loockfrom_decl(i: Span) -> IResult<Span, CameraConfigEnum> {
     let (i, expr) = delimited(
         space_delimited(tag("lookfrom:")),
-        space_delimited(vec3_expr),
+        space_delimited(vec3_ident_expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, CameraConfigEnum::Lookfrom(expr)))
 }
 
 fn loockat_decl(i: Span) -> IResult<Span, CameraConfigEnum> {
     let (i, expr) = delimited(
         space_delimited(tag("lookat:")),
-        space_delimited(vec3_expr),
+        space_delimited(vec3_ident_expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, CameraConfigEnum::Lookat(expr)))
 }
 
 fn up_decl(i: Span) -> IResult<Span, CameraConfigEnum> {
     let (i, expr) = delimited(
         space_delimited(tag("up:")),
-        space_delimited(vec3_expr),
+        space_delimited(vec3_ident_expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, CameraConfigEnum::Up(expr)))
 }
 
@@ -68,6 +71,7 @@ fn angle_decl(i: Span) -> IResult<Span, CameraConfigEnum> {
         space_delimited(expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, CameraConfigEnum::Angle(expr)))
 }
 
@@ -77,6 +81,7 @@ fn dist_to_focus_decl(i: Span) -> IResult<Span, CameraConfigEnum> {
         space_delimited(expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, CameraConfigEnum::DistToFocus(expr)))
 }
 
@@ -146,6 +151,7 @@ fn width_decl(i: Span) -> IResult<Span, ConfigEnum> {
         space_delimited(expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, ConfigEnum::Width(expr)))
 }
 
@@ -155,6 +161,7 @@ fn height_decl(i: Span) -> IResult<Span, ConfigEnum> {
         space_delimited(expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, ConfigEnum::Height(expr)))
 }
 
@@ -164,6 +171,7 @@ fn samples_per_pixel_decl(i: Span) -> IResult<Span, ConfigEnum> {
         space_delimited(expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, ConfigEnum::SamplesPerPixel(expr)))
 }
 
@@ -173,6 +181,7 @@ fn max_depth_decl(i: Span) -> IResult<Span, ConfigEnum> {
         space_delimited(expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, ConfigEnum::MaxDepth(expr)))
 }
 
@@ -182,6 +191,7 @@ fn sky_color_decl(i: Span) -> IResult<Span, ConfigEnum> {
         space_delimited(vec3_ident_expr),
         space_delimited(tag(",")),
     )(i)?;
+    let (i, _) = opt(space_delimited(comment_expr))(i)?;
     Ok((i, ConfigEnum::SkyColor(expr)))
 }
 
@@ -312,12 +322,8 @@ fn continue_statement(i: Span) -> IResult<Span, Statement> {
 }
 
 fn comment_statement(i: Span) -> IResult<Span, Statement> {
-    let (i, _) = space_delimited(tag("//"))(i)?;
-    let (i, _) = take_until("\n")(i)?;
-    Ok((
-        i,
-        Statement::Expression(Expression::new(ExprEnum::NumLiteral(0.0), i)),
-    ))
+    let (i, ex) = space_delimited(comment_expr)(i)?;
+    Ok((i, Statement::Expression(ex)))
 }
 
 pub fn statement(i: Span) -> IResult<Span, Statement> {
@@ -325,13 +331,13 @@ pub fn statement(i: Span) -> IResult<Span, Statement> {
         object_statement,
         camera_statement,
         config_statement,
-        comment_statement,
         var_assign,
         if_statement,
         while_statement,
         terminated(break_statement, pair(tag(";"), multispace0)),
         terminated(continue_statement, pair(tag(";"), multispace0)),
         terminated(expr_statement, pair(tag(";"), multispace0)),
+        comment_statement,
     ))(i)
 }
 
