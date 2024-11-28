@@ -12,7 +12,7 @@ This software is written in Rust and the ray-tracing engine is [toy-ray-racer-rs
 cargo run --release -- -o <output_path> <scene_file_path>
 ```
 
-### Example
+### Examples
 
 #### Cornell Box
 
@@ -199,7 +199,31 @@ Sphere {
 
 ## Syntax
 
-### Camera
+### Tables of Contents
+
+- [Camera](#camera)
+- [Config](#config)
+- [Objects](#objects)
+  - [Sphere](#sphere)
+  - [Plane](#plane)
+  - [Box](#box)
+  - [Group](#group)
+- [Materials](#material)
+  - [Lambertian](#lambertian)
+  - [Metal](#metal)
+  - [Dielectric](#dielectric)
+  - [Light](#light)
+- [Textures](#texture)
+  - [Solid](#solid)
+  - [Checker](#checker)
+  - [Perlin](#perlin)
+- [Vec3](#vec3)
+- [Variables](#variables)
+- [While Statement](#while-statement)
+- [If Statement](#if-statement)
+- [Supported Functions](#supported-functions)
+
+### Camera <a name="camera"></a>
 
 ```
 Camera {
@@ -221,7 +245,8 @@ Camera {
 | dist_to_focus(optional) | number | Distance to focus (default: 10.0)|
 | angle | number | Angle of the camera |
 
-### Confnig
+
+### Confnig <a name="config"></a>
 
 ```
 Config {
@@ -251,9 +276,9 @@ Config {
 | height | number | Height of the image |
 | samples | number | Number of samples for anti-aliasing |
 
-### Objects
+### Objects <a name="objects"></a>
 
-#### Sphere
+#### Sphere <a name="sphere"></a>
 
 ```
 Sphere {
@@ -277,7 +302,7 @@ Sphere {
 | rotateY(optional) | number | Rotation of the sphere in Y-axis |
 | rotateZ(optional) | number | Rotation of the sphere in Z-axis |
 
-#### Plane
+#### Plane <a name="plane"></a>
 
 ```
 Plane {
@@ -297,7 +322,7 @@ Plane {
 | rotateY(optional) | number | Rotation of the plane in Y-axis |
 | rotateZ(optional) | number | Rotation of the plane in Z-axis |
 
-#### Box
+#### Box <a name="box"></a>
 
 ```
 Box {
@@ -317,7 +342,7 @@ Box {
 | rotateY(optional) | number | Rotation of the box in Y-axis |
 | rotateZ(optional) | number | Rotation of the box in Z-axis |
 
-#### Group
+#### Group <a name="group"></a>
 
 ```
 Objs {
@@ -350,7 +375,7 @@ This is a group of objects. You can put any objects in this.
 
 ### Materials <a name="material"></a>
 
-#### Lambertian
+#### Lambertian <a name="lambertian"></a>
 
 ```
 Lambertian(Solid(<0, 0, 0>))
@@ -360,7 +385,7 @@ Lambertian(Solid(<0, 0, 0>))
 
 - [Texture](#texture)
 
-#### Metal
+#### Metal <a name="metal"></a>
 
 ```
 Metal(<100, 100, 0>, 0.3)
@@ -371,7 +396,7 @@ Metal(<100, 100, 0>, 0.3)
 - [Vec3](#vec3): Color
 - number: Fuzziness
 
-#### Dielectric
+#### Dielectric <a name="dielectric"></a>
 
 ```
 Dielectric(1.5)
@@ -381,7 +406,7 @@ Dielectric(1.5)
 
 - number: Refractive index
 
-##### Light 
+##### Light <a name="light"></a>
 
 ```
 Light(<100, 100, 100>, 10)
@@ -394,7 +419,7 @@ Light(<100, 100, 100>, 10)
 
 ### Textures <a name="texture"></a>
 
-#### Solid
+#### Solid <a name="solid"></a>
 
 ```
 Solid(<0, 0, 0>)
@@ -404,7 +429,7 @@ Solid(<0, 0, 0>)
 
 - [Vec3](#vec3): Color
 
-#### Checker
+#### Checker <a name="checker"></a>
 
 ```
 Checker(Solid(<0, 0, 0>), Perlin(0.3))
@@ -415,7 +440,7 @@ Checker(Solid(<0, 0, 0>), Perlin(0.3))
 - [Texture](#texture): Texture1
 - [Texture](#texture): Texture2
 
-#### Perlin (Noise)
+#### Perlin (Noise) <a name="perlin"></a>
 
 ```
 Perlin(0.3)
@@ -443,7 +468,7 @@ If color (0-255)
 - number: g
 - number: b
 
-### Variables
+### Variables <a name="variables"></a>
 
 You can define and use variables in the scene file.<br>
 Variable can be used only as a number or a Color Vector.
@@ -451,7 +476,7 @@ Variable can be used only as a number or a Color Vector.
 n = 10;
 ```
 
-### While Statement
+### While Statement <a name="while-statement"></a>
 
 ```
 n = 0;
@@ -465,7 +490,7 @@ While n < 10 {
 }
 ```
 
-### If Statement
+### If Statement <a name="if-statement"></a>
 
 ```
 n = 10;
@@ -478,7 +503,7 @@ If n < 10 {
 }
 ```
 
-### Functions
+### Supported Functions <a name="supported-functions"></a>
 
 - `sqrt(x: number) -> number`
 - `sin(x: number) -> number`
