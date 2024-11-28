@@ -186,7 +186,6 @@ fn sky_color_decl(i: Span) -> IResult<Span, ConfigEnum> {
 }
 
 fn config_statement(i: Span) -> IResult<Span, Statement> {
-    println!("{:?}", i);
     let (i, _) = space_delimited(tag("Config"))(i)?;
     let (i, _) = space_delimited(open_brace)(i)?;
 

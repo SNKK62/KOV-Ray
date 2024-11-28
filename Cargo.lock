@@ -551,7 +551,7 @@ checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
 [[package]]
 name = "pg-indicator"
 version = "0.1.0"
-source = "git+https://github.com/SNKK62/pg-indicator-rs?rev=6457866#6457866abc8678b745de7a8b4d626f9535be1787"
+source = "git+https://github.com/SNKK62/pg-indicator-rs?rev=fa1a882#fa1a8823e30963afd0a269d77ef173af79c31de6"
 dependencies = [
  "libc",
 ]
