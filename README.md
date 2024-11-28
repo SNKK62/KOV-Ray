@@ -2,9 +2,9 @@
 
 This is scene discribing language for Ray Tracing of Computer Graphics.
 
-This is inspired by ![POV-Ray](https://www.povray.org/).
+This is inspired by [POV-Ray](https://www.povray.org/).
 
-This software is written in Rust and the ray-tracing engine is ![toy-ray-racer-rs](https://github.com/SNKK62/toy-ray-tracer-rs) I developed.
+This software is written in Rust and the ray-tracing engine is [toy-ray-racer-rs](https://github.com/SNKK62/toy-ray-tracer-rs) I developed.
 
 ### How to run
 
