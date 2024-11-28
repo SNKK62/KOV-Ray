@@ -471,7 +471,7 @@ If color (0-255)
 ### Variables <a name="variables"></a>
 
 You can define and use variables in the scene file.<br>
-Variable can be used only as a number or a Color Vector.
+Variable can be used as a number or a [Vec3](#vec3).
 ```
 n = 10;
 ```
