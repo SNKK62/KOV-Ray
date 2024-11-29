@@ -28,7 +28,7 @@ type Variables = HashMap<String, value::Value>;
 
 const COLOR_MAX: f64 = 255.0;
 
-fn eval_ast(ast: &AST) -> (Vec<Arc<dyn Hittable>>, ConfigValue, Camera) {
+pub fn eval_ast(ast: &AST) -> (Vec<Arc<dyn Hittable>>, ConfigValue, Camera) {
     let mut world = Vec::new();
     let mut config = None;
     let mut camera_config = None;

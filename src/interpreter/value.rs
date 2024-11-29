@@ -22,7 +22,7 @@ impl Value {
     }
 }
 
-pub(crate) struct ConfigValue {
+pub struct ConfigValue {
     pub(crate) width: f64,
     pub(crate) height: f64,
     pub(crate) samples_per_pixel: f64,
