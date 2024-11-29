@@ -80,7 +80,7 @@ pub(super) fn eval_stmt<'a>(
                 },
                 None => 100.0,
             };
-            let background = match c.sky_color.as_ref() {
+            let background = match c.background.as_ref() {
                 Some(expr) => match eval_expr(expr, variables, funcs) {
                     Value::Vec3(x, y, z) => Color::new(x, y, z) / COLOR_MAX,
                     _ => panic!("Invalid sky_color"),

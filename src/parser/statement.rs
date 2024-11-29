@@ -142,7 +142,7 @@ enum ConfigEnum<'a> {
     Height(Expression<'a>),
     SamplesPerPixel(Expression<'a>),
     MaxDepth(Expression<'a>),
-    SkyColor(Expression<'a>),
+    Background(Expression<'a>),
 }
 
 fn width_decl(i: Span) -> IResult<Span, ConfigEnum> {
@@ -185,14 +185,14 @@ fn max_depth_decl(i: Span) -> IResult<Span, ConfigEnum> {
     Ok((i, ConfigEnum::MaxDepth(expr)))
 }
 
-fn sky_color_decl(i: Span) -> IResult<Span, ConfigEnum> {
+fn background_decl(i: Span) -> IResult<Span, ConfigEnum> {
     let (i, expr) = delimited(
-        space_delimited(tag("sky_color:")),
+        space_delimited(tag("background:")),
         space_delimited(vec3_ident_expr),
         space_delimited(tag(",")),
     )(i)?;
     let (i, _) = opt(space_delimited(comment_expr))(i)?;
-    Ok((i, ConfigEnum::SkyColor(expr)))
+    Ok((i, ConfigEnum::Background(expr)))
 }
 
 fn config_statement(i: Span) -> IResult<Span, Statement> {
@@ -203,7 +203,7 @@ fn config_statement(i: Span) -> IResult<Span, Statement> {
     let mut height: Option<Expression> = None;
     let mut samples_per_pixel: Option<Expression> = None;
     let mut max_depth: Option<Expression> = None;
-    let mut sky_color: Option<Expression> = None;
+    let mut background: Option<Expression> = None;
     let i0 = i;
 
     let (i, p) = many0(alt((
@@ -211,7 +211,7 @@ fn config_statement(i: Span) -> IResult<Span, Statement> {
         height_decl,
         samples_per_pixel_decl,
         max_depth_decl,
-        sky_color_decl,
+        background_decl,
     )))(i)?;
 
     p.iter().for_each(|v| match v {
@@ -219,7 +219,7 @@ fn config_statement(i: Span) -> IResult<Span, Statement> {
         ConfigEnum::Height(expr) => height = Some(expr.clone()),
         ConfigEnum::SamplesPerPixel(expr) => samples_per_pixel = Some(expr.clone()),
         ConfigEnum::MaxDepth(expr) => max_depth = Some(expr.clone()),
-        ConfigEnum::SkyColor(expr) => sky_color = Some(expr.clone()),
+        ConfigEnum::Background(expr) => background = Some(expr.clone()),
     });
 
     if samples_per_pixel.is_none() || width.is_none() || height.is_none() {
@@ -240,7 +240,7 @@ fn config_statement(i: Span) -> IResult<Span, Statement> {
                 height: height.unwrap(),
                 samples_per_pixel: samples_per_pixel.unwrap(),
                 max_depth,
-                sky_color,
+                background,
             },
         }),
     ))

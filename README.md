@@ -117,7 +117,7 @@ Config {
     height: 512 * 9 / 16,
     samples_per_pixel: 1000,
     max_depth: 100,
-    sky_color: <255 * 0.5, 255 * 0.7, 255>,
+    background: <255 * 0.5, 255 * 0.7, 255>,
 }
 
 GRAY = <127.5, 127.5, 127.5>;
@@ -254,7 +254,7 @@ Config {
     height: 600,
     samples_per_pixel: 100,
     max_depth: 50,
-    sky_color: <0, 0, 0>,
+    background: <0, 0, 0>,
 }
 ```
 
@@ -266,7 +266,7 @@ Config {
 | height | number | Height of the image |
 | samples_per_pixel | number | Number of samples for anti-aliasing |
 | max_depth(optional) | number | Maximum depth of the ray(default: 100)|
-| sky_color(optional) | [Vec3](#vec3) | Color of the sky(default: <0, 0, 0>)|
+|background(optional) | [Vec3](#vec3) | Color of the background(default: <0, 0, 0>)|
 
 #### Options
 
