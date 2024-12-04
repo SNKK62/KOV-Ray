@@ -1,6 +1,9 @@
 use image::RgbImage;
-use kov_ray::{interpreter::interpret, parser};
+#[cfg(feature = "execution")]
+use kov_ray::interpreter::interpret;
+use kov_ray::parser;
 
+#[cfg(feature = "execution")]
 fn main() {
     let args = kov_ray::parse_args().unwrap_or_else(|| std::process::exit(1));
     let source_file_name = args.source.unwrap();

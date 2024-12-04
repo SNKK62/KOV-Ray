@@ -9,7 +9,7 @@ This software is written in Rust and the ray-tracing engine is [toy-ray-racer-rs
 ### How to run
 
 ```sh
-cargo run --release -- -o <output_path> <scene_file_path>
+cargo run --release --features execution -- -o <output_path> <scene_file_path>
 ```
 
 ### Examples

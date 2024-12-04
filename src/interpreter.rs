@@ -9,6 +9,7 @@ pub use value::ConfigValue;
 
 use crate::ast::AST;
 
+#[cfg(feature = "execution")]
 use pg_indicator::{PGOutput, PGStyle, ProgressBar};
 use rand::Rng;
 
@@ -71,6 +72,7 @@ pub fn eval_ast(ast: &AST) -> (HittableEnum, ConfigValue, Camera) {
     (world, config, camera)
 }
 
+#[cfg(feature = "execution")]
 pub fn interpret(ast: &AST) -> (Vec<u8>, u32, u32) {
     let (world, config, camera) = eval_ast(ast);
     let world = Arc::new(world);

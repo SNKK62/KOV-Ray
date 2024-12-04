@@ -9,4 +9,8 @@ nom = "7.1.3"
 nom_locate = "4.2.0"
 rand = "0.8.5"
 ray-tracer-rs = {git = "https://github.com/SNKK62/toy-ray-tracer-rs", rev = "930e76e"}
-pg-indicator = {git = "https://github.com/SNKK62/pg-indicator-rs", rev = "fa1a882"}
+pg-indicator = {git = "https://github.com/SNKK62/pg-indicator-rs", rev = "fa1a882", optional = true}
+
+[features]
+default = []
+execution = ["pg-indicator"]
