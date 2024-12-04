@@ -28,7 +28,7 @@ type Variables = HashMap<String, value::Value>;
 
 const COLOR_MAX: f64 = 255.0;
 
-pub fn eval_ast(ast: &AST) -> (Vec<HittableEnum>, ConfigValue, Camera) {
+pub fn eval_ast(ast: &AST) -> (HittableEnum, ConfigValue, Camera) {
     let mut world = Vec::new();
     let mut config = None;
     let mut camera_config = None;
@@ -44,6 +44,9 @@ pub fn eval_ast(ast: &AST) -> (Vec<HittableEnum>, ConfigValue, Camera) {
             &mut camera_config,
         );
     }
+    // TODO: apply motion blur
+    let world = HittableEnum::BvhNode(Box::new(BvhNode::new(&mut world, 0.0, 0.0)));
+
     if config.is_none() {
         panic!("Config not found");
     }
@@ -69,11 +72,8 @@ pub fn eval_ast(ast: &AST) -> (Vec<HittableEnum>, ConfigValue, Camera) {
 }
 
 pub fn interpret(ast: &AST) -> (Vec<u8>, u32, u32) {
-    let (mut world, config, camera) = eval_ast(ast);
-    // TODO: apply motion blur
-    let world = Arc::new(HittableEnum::BvhNode(Box::new(BvhNode::new(
-        &mut world, 0.0, 0.0,
-    ))));
+    let (world, config, camera) = eval_ast(ast);
+    let world = Arc::new(world);
 
     let width = config.width.round() as u32;
     let height = config.height.round() as u32;
