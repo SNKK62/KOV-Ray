@@ -719,10 +719,9 @@ dependencies = [
 [[package]]
 name = "ray-tracer-rs"
 version = "0.1.0"
-source = "git+https://github.com/SNKK62/toy-ray-tracer-rs?rev=930e76e#930e76e6e75fba1480637a3cb517c1d8a3c6e1e5"
+source = "git+https://github.com/SNKK62/toy-ray-tracer-rs?rev=651de45#651de45ea3b237f3117a776b2fbf721949c30d0a"
 dependencies = [
  "image",
- "libc",
  "rand",
 ]
 
