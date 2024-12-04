@@ -22,11 +22,11 @@ impl Value {
 }
 
 pub struct ConfigValue {
-    pub(crate) width: f64,
-    pub(crate) height: f64,
-    pub(crate) samples_per_pixel: f64,
-    pub(crate) max_depth: f64,
-    pub(crate) background: Vec3,
+    pub width: f64,
+    pub height: f64,
+    pub samples_per_pixel: f64,
+    pub max_depth: f64,
+    pub background: Vec3,
 }
 
 pub(crate) struct CameraConfigValue {
