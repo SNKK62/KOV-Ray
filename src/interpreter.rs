@@ -5,7 +5,7 @@ mod object;
 mod statement;
 use statement::eval_stmt;
 mod value;
-use value::ConfigValue;
+pub use value::ConfigValue;
 
 use crate::ast::AST;
 
