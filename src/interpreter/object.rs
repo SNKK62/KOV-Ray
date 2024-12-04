@@ -5,20 +5,21 @@ use crate::ast::{
 };
 use ray_tracer_rs::{
     hittable::{
-        BvhNode, Cuboid, Hittable, RotateX, RotateY, RotateZ, Sphere, Translation, XYRect, XZRect,
-        YZRect,
+        BvhNode, Cuboid, HittableEnum, RotateX, RotateY, RotateZ, Sphere, Translation, XYRect,
+        XZRect, YZRect,
     },
     vec3::Vec3,
 };
-use std::sync::Arc;
+
+use std::boxed::Box;
 
 pub(super) fn eval_object(
     object: &Object,
     variables: &mut Variables,
     funcs: &Functions,
-    world: &mut Vec<Arc<dyn Hittable>>,
+    world: &mut Vec<HittableEnum>,
 ) {
-    let (mut obj, affine): (Arc<dyn Hittable>, &Vec<AffineProperties>) = match object {
+    let (mut obj, affine): (HittableEnum, &Vec<AffineProperties>) = match object {
         Object::Sphere {
             center,
             radius,
@@ -36,7 +37,10 @@ pub(super) fn eval_object(
                 Value::Material(material) => material,
                 _ => panic!("Invalid arguments for Sphere"),
             };
-            (Arc::new(Sphere::new(&center, radius, material)), affine)
+            (
+                HittableEnum::Sphere(Sphere::new(&center, radius, material)),
+                affine,
+            )
         }
         Object::Box {
             vertex,
@@ -56,7 +60,10 @@ pub(super) fn eval_object(
                 Value::Material(material) => material,
                 _ => panic!("Invalid arguments for Box"),
             };
-            (Arc::new(Cuboid::new(&vertex1, &vertex2, material)), affine)
+            (
+                HittableEnum::Cuboid(Cuboid::new(&vertex1, &vertex2, material)),
+                affine,
+            )
         }
         Object::Plane {
             vertex,
@@ -76,8 +83,8 @@ pub(super) fn eval_object(
                 Value::Material(material) => material,
                 _ => panic!("Invalid arguments for Plane"),
             };
-            let rect: Arc<dyn Hittable> = if vertex1.x() == vertex2.x() {
-                Arc::new(YZRect::new(
+            let rect: HittableEnum = if vertex1.x() == vertex2.x() {
+                HittableEnum::YZRect(YZRect::new(
                     vertex1.y(),
                     vertex2.y(),
                     vertex1.z(),
@@ -86,7 +93,7 @@ pub(super) fn eval_object(
                     material,
                 ))
             } else if vertex1.y() == vertex2.y() {
-                Arc::new(XZRect::new(
+                HittableEnum::XZRect(XZRect::new(
                     vertex1.x(),
                     vertex2.x(),
                     vertex1.z(),
@@ -95,7 +102,7 @@ pub(super) fn eval_object(
                     material,
                 ))
             } else if vertex1.z() == vertex2.z() {
-                Arc::new(XYRect::new(
+                HittableEnum::XYRect(XYRect::new(
                     vertex1.x(),
                     vertex2.x(),
                     vertex1.y(),
@@ -114,7 +121,10 @@ pub(super) fn eval_object(
                 eval_object(obj, variables, funcs, &mut objs);
             }
             // TODO: apply motion blur
-            (Arc::new(BvhNode::new(&mut objs, 0.0, 0.0)), affine)
+            (
+                HittableEnum::BvhNode(Box::new(BvhNode::new(&mut objs, 0.0, 0.0))),
+                affine,
+            )
         }
     };
     for af in affine.iter() {
@@ -124,7 +134,7 @@ pub(super) fn eval_object(
                     Value::Vec3(x, y, z) => Vec3::new(x, y, z),
                     _ => panic!("Invalid arguments for Sphere"),
                 };
-                obj = Arc::new(Translation::new(obj, offset));
+                obj = HittableEnum::Translation(Translation::new(obj, offset));
             }
             AffineProperties::Rotate(rotate) => {
                 let angle = match eval_expr(&rotate.expr, variables, funcs) {
@@ -132,9 +142,9 @@ pub(super) fn eval_object(
                     _ => panic!("Invalid arguments for Rotate"),
                 };
                 obj = match rotate.axis {
-                    RotateAxis::X => Arc::new(RotateX::new(obj, angle)),
-                    RotateAxis::Y => Arc::new(RotateY::new(obj, angle)),
-                    RotateAxis::Z => Arc::new(RotateZ::new(obj, angle)),
+                    RotateAxis::X => HittableEnum::RotateX(Box::new(RotateX::new(obj, angle))),
+                    RotateAxis::Y => HittableEnum::RotateY(Box::new(RotateY::new(obj, angle))),
+                    RotateAxis::Z => HittableEnum::RotateZ(Box::new(RotateZ::new(obj, angle))),
                 };
             }
         }

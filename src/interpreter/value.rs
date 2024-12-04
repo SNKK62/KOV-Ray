@@ -1,5 +1,4 @@
-use ray_tracer_rs::{material::Material, texture::Texture, vec3::Vec3};
-use std::sync::{Arc, RwLock};
+use ray_tracer_rs::{material::MaterialEnum, texture::TextureEnum, vec3::Vec3};
 
 #[derive(Clone)]
 pub(super) enum Value {
@@ -7,8 +6,8 @@ pub(super) enum Value {
     Str(String),
     Bool(bool),
     Vec3(f64, f64, f64),
-    Material(Arc<RwLock<dyn Material>>),
-    Texture(Arc<dyn Texture>),
+    Material(MaterialEnum),
+    Texture(TextureEnum),
 }
 
 impl Value {

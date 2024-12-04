@@ -7,17 +7,15 @@ use super::{
 };
 use crate::ast::Statement;
 use ray_tracer_rs::{
-    hittable::Hittable,
+    hittable::HittableEnum,
     vec3::{Color, Vec3},
 };
-
-use std::sync::Arc;
 
 pub(super) fn eval_stmt<'a>(
     ast: &Statement<'a>,
     variables: &mut Variables,
     funcs: &Functions<'a>,
-    world: &mut Vec<Arc<dyn Hittable>>,
+    world: &mut Vec<HittableEnum>,
     config: &mut Option<ConfigValue>,
     camera_config: &mut Option<CameraConfigValue>,
 ) {

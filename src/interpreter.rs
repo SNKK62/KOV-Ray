@@ -14,7 +14,7 @@ use rand::Rng;
 
 use ray_tracer_rs::{
     camera::Camera,
-    hittable::{BvhNode, Hittable},
+    hittable::{BvhNode, HittableEnum},
     vec3::Color,
 };
 use std::{
@@ -28,7 +28,7 @@ type Variables = HashMap<String, value::Value>;
 
 const COLOR_MAX: f64 = 255.0;
 
-pub fn eval_ast(ast: &AST) -> (Vec<Arc<dyn Hittable>>, ConfigValue, Camera) {
+pub fn eval_ast(ast: &AST) -> (Vec<HittableEnum>, ConfigValue, Camera) {
     let mut world = Vec::new();
     let mut config = None;
     let mut camera_config = None;
@@ -71,7 +71,9 @@ pub fn eval_ast(ast: &AST) -> (Vec<Arc<dyn Hittable>>, ConfigValue, Camera) {
 pub fn interpret(ast: &AST) -> (Vec<u8>, u32, u32) {
     let (mut world, config, camera) = eval_ast(ast);
     // TODO: apply motion blur
-    let world = Arc::new(BvhNode::new(&mut world, 0.0, 0.0));
+    let world = Arc::new(HittableEnum::BvhNode(Box::new(BvhNode::new(
+        &mut world, 0.0, 0.0,
+    ))));
 
     let width = config.width.round() as u32;
     let height = config.height.round() as u32;
@@ -103,7 +105,7 @@ pub fn interpret(ast: &AST) -> (Vec<u8>, u32, u32) {
                         let u = (i as f64 + rng.gen_range(0.0..1.0)) / (width - 1) as f64;
                         let v = (j as f64 + rng.gen_range(0.0..1.0)) / (height - 1) as f64;
                         let ray = camera.get_ray(u, v);
-                        pixel_color += ray.color(&background, &*world, max_depth);
+                        pixel_color += ray.color(&background, &world, max_depth);
                     }
                     let mut buf = buffer.write().unwrap();
                     let (r, g, b) = pixel_color.get_color(samples_per_pixel as i64);

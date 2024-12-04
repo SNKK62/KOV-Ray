@@ -7,12 +7,10 @@ use crate::ast::{
     material::Material as MaterialAST, texture::Texture as TextureAST, ExprEnum, Expression,
 };
 use ray_tracer_rs::{
-    material::{Dielectric, DiffuseLight, Lambertian, Metal},
-    texture::{Checker, NoiseTexture, SolidColor},
+    material::{Dielectric, DiffuseLight, Lambertian, MaterialEnum, Metal},
+    texture::{Checker, NoiseTexture, SolidColor, TextureEnum},
     vec3::Color,
 };
-
-use std::sync::{Arc, RwLock};
 
 pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Functions) -> Value {
     match &ast.expr {
@@ -136,7 +134,7 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
                 let texture = eval_expr(texture, variables, funcs);
                 match texture {
                     Value::Texture(texture) => {
-                        Value::Material(Arc::new(RwLock::new(Lambertian::new(texture))))
+                        Value::Material(MaterialEnum::Lambertian(Lambertian::new(&texture)))
                     }
                     _ => panic!("Invalid texture type"),
                 }
@@ -145,9 +143,9 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
                 let color = eval_expr(color, variables, funcs);
                 let fuzz = eval_expr(fuzz, variables, funcs);
                 match (color, fuzz) {
-                    (Value::Vec3(r, g, b), Value::Num(fuzz)) => Value::Material(Arc::new(
-                        RwLock::new(Metal::new(&(Color::new(r, g, b) / COLOR_MAX), fuzz)),
-                    )),
+                    (Value::Vec3(r, g, b), Value::Num(fuzz)) => Value::Material(
+                        MaterialEnum::Metal(Metal::new(&(Color::new(r, g, b) / COLOR_MAX), fuzz)),
+                    ),
                     _ => panic!("Invalid color or fuzz type"),
                 }
             }
@@ -155,7 +153,7 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
                 let reflection_index = eval_expr(reflection_index, variables, funcs);
                 match reflection_index {
                     Value::Num(reflection_index) => {
-                        Value::Material(Arc::new(RwLock::new(Dielectric::new(reflection_index))))
+                        Value::Material(MaterialEnum::Dielectric(Dielectric::new(reflection_index)))
                     }
                     _ => panic!("Invalid reflection index type"),
                 }
@@ -164,11 +162,11 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
                 let color = eval_expr(color, variables, funcs);
                 let intensity = eval_expr(intensity, variables, funcs);
                 match (color, intensity) {
-                    (Value::Vec3(r, g, b), Value::Num(intensity)) => {
-                        Value::Material(Arc::new(RwLock::new(DiffuseLight::new(Arc::new(
+                    (Value::Vec3(r, g, b), Value::Num(intensity)) => Value::Material(
+                        MaterialEnum::DiffuseLight(DiffuseLight::new(&TextureEnum::SolidColor(
                             SolidColor::new(Color::new(r, g, b) / COLOR_MAX * intensity),
-                        )))))
-                    }
+                        ))),
+                    ),
                     _ => panic!("Invalid color or intensity type"),
                 }
             }
@@ -177,9 +175,9 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
             TextureAST::SolidColor(color) => {
                 let color = eval_expr(color, variables, funcs);
                 match color {
-                    Value::Vec3(r, g, b) => {
-                        Value::Texture(Arc::new(SolidColor::new(Color::new(r, g, b) / COLOR_MAX)))
-                    }
+                    Value::Vec3(r, g, b) => Value::Texture(TextureEnum::SolidColor(
+                        SolidColor::new(Color::new(r, g, b) / COLOR_MAX),
+                    )),
                     _ => panic!("Invalid color type"),
                 }
             }
@@ -188,7 +186,7 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
                 let even = eval_expr(even, variables, funcs);
                 match (odd, even) {
                     (Value::Texture(odd), Value::Texture(even)) => {
-                        Value::Texture(Arc::new(Checker::new(odd, even)))
+                        Value::Texture(TextureEnum::Checker(Checker::new(odd, even)))
                     }
                     _ => panic!("Invalid checker type"),
                 }
@@ -196,7 +194,9 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
             TextureAST::Perlin(scale) => {
                 let scale = eval_expr(scale, variables, funcs);
                 match scale {
-                    Value::Num(scale) => Value::Texture(Arc::new(NoiseTexture::new(scale))),
+                    Value::Num(scale) => {
+                        Value::Texture(TextureEnum::NoiseTexture(NoiseTexture::new(scale)))
+                    }
                     _ => panic!("Invalid scale type"),
                 }
             }
