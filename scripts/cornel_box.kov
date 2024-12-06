@@ -1,5 +1,5 @@
 Camera {
-    lookfrom: <278, 278, -800>,
+    lookfrom: <278, 278, -800>, // camera position
     lookat: <278, 278, 0>,
     dist_to_focus: 10,
     angle: 40,

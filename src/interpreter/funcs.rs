@@ -1,20 +1,25 @@
 use std::collections::HashMap;
 
+use super::value::Value;
+
 use rand::Rng;
 
 pub type Functions<'src> = HashMap<String, FnDecl>;
 
 fn noarg_fn(f: fn() -> f64) -> FnDecl {
     FnDecl::Native(NativeFn {
-        code: Box::new(move |_| f()),
+        code: Box::new(move |_| Value::Num(f())),
     })
 }
 
 fn unary_fn(f: fn(f64) -> f64) -> FnDecl {
     FnDecl::Native(NativeFn {
         code: Box::new(move |args| {
-            let arg = args.iter().next().expect("function missing argument");
-            f(*arg)
+            let arg = match args.iter().next().expect("function missing argument") {
+                Value::Num(n) => n,
+                _ => panic!("Invalid argument type"),
+            };
+            Value::Num(f(*arg))
         }),
     })
 }
@@ -23,9 +28,15 @@ fn binary_fn(f: fn(f64, f64) -> f64) -> FnDecl {
     FnDecl::Native(NativeFn {
         code: Box::new(move |args| {
             let mut args = args.iter();
-            let lhs = args.next().expect("function missing argument");
-            let rhs = args.next().expect("function missing argument");
-            f(*lhs, *rhs)
+            let lhs = match args.next().expect("function missing argument") {
+                Value::Num(n) => n,
+                _ => panic!("Invalid argument type"),
+            };
+            let rhs = match args.next().expect("function missing argument") {
+                Value::Num(n) => n,
+                _ => panic!("Invalid argument type"),
+            };
+            Value::Num(f(*lhs, *rhs))
         }),
     })
 }
@@ -48,6 +59,18 @@ pub fn standard_functions<'src>() -> Functions<'src> {
         "rand".to_string(),
         noarg_fn(|| rand::thread_rng().gen_range(0.0..1.0)),
     );
+    funcs.insert(
+        "len".to_string(),
+        FnDecl::Native(NativeFn {
+            code: Box::new(|args| {
+                let arg = match args.iter().next().expect("function missing argument") {
+                    Value::Vec3(x, y, z) => (x * x + y * y + z * z).sqrt(),
+                    _ => panic!("Invalid argument type"),
+                };
+                Value::Num(arg)
+            }),
+        }),
+    );
     funcs
 }
 
@@ -55,7 +78,7 @@ pub enum FnDecl {
     Native(NativeFn),
 }
 
-type NativeFnCode = dyn Fn(&[f64]) -> f64;
+type NativeFnCode = dyn Fn(&[Value]) -> Value;
 pub struct NativeFn {
     pub code: Box<NativeFnCode>,
 }

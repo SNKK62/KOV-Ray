@@ -136,18 +136,17 @@ while a < 11 {
     while b < 11 {
         choose_mat = rand();
         radius = 0.2;
-        center_x = a + 0.9 * rand();
-        center_y = 0.2;
-        center_z = b + 0.9 * rand();
+        center = <a + 0.9 * rand(), 0.2, b + 0.9 * rand()>;
+        temp_vec = <4, 0.2, 0>;
 
         // distance between (4, 0.2, 0) and center
-        length = sqrt(pow((center_x - 4), 2) + pow((center_y - radius), 2) + pow(center_z, 2));
+        length = len(center - temp_vec);
 
         if length > 0.9 {
             if choose_mat < 0.7 {
                 ALBEDO = <255 * rand(), 255 * rand(), 255 * rand()>;
                 Sphere {
-                    center: <center_x, center_y, center_z>,
+                    center: center,
                     radius: radius,
                     material: Lambertian(Solid(ALBEDO)),
                 }
@@ -155,13 +154,13 @@ while a < 11 {
                 ALBEDO = <255 * (0.5 + rand() / 2), 255 * (0.5 + rand() / 2), 255 * (0.5 + rand() / 2)>;
                 fuzz = rand() / 2;
                 Sphere {
-                    center: <center_x, center_y, center_z>,
+                    center: center,
                     radius: radius,
                     material: Metal(ALBEDO, fuzz),
                 }
             } else {
                 Sphere {
-                    center: <center_x, center_y, center_z>,
+                    center: center,
                     radius: radius,
                     material: Dielectric(1.5),
                 }

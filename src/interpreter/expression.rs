@@ -33,17 +33,11 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
                 .unwrap_or_else(|| panic!("function {} not found", name));
             let args = args
                 .iter()
-                .map(|arg| {
-                    let val = eval_expr(arg, variables, funcs);
-                    match val {
-                        Value::Num(n) => n,
-                        _ => panic!("Invalid argument type"),
-                    }
-                })
+                .map(|arg| eval_expr(arg, variables, funcs))
                 .collect::<Vec<_>>();
             // TODO: handle non-native functions
             match func {
-                FnDecl::Native(native) => Value::Num(native.code.as_ref()(&args)),
+                FnDecl::Native(native) => native.code.as_ref()(&args),
             }
         }
         ExprEnum::Add(a, b) => {
