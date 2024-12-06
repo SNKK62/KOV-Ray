@@ -15,6 +15,7 @@ fn factor(i: Span) -> IResult<Span, Expression> {
     alt((
         str_literal,
         num_literal,
+        vec3_expr,
         func_call,
         ident,
         not_factor,

@@ -51,6 +51,9 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
             let rhs = eval_expr(b, variables, funcs);
             match (lhs, rhs) {
                 (Value::Num(lhs), Value::Num(rhs)) => Value::Num(lhs + rhs),
+                (Value::Vec3(x1, y1, z1), Value::Vec3(x2, y2, z2)) => {
+                    Value::Vec3(x1 + x2, y1 + y2, z1 + z2)
+                }
                 _ => panic!("Invalid operands for addition"),
             }
         }
@@ -59,6 +62,9 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
             let rhs = eval_expr(b, variables, funcs);
             match (lhs, rhs) {
                 (Value::Num(lhs), Value::Num(rhs)) => Value::Num(lhs - rhs),
+                (Value::Vec3(x1, y1, z1), Value::Vec3(x2, y2, z2)) => {
+                    Value::Vec3(x1 - x2, y1 - y2, z1 - z2)
+                }
                 _ => panic!("Invalid operands for subtraction"),
             }
         }
@@ -67,6 +73,11 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
             let rhs = eval_expr(b, variables, funcs);
             match (lhs, rhs) {
                 (Value::Num(lhs), Value::Num(rhs)) => Value::Num(lhs * rhs),
+                (Value::Num(lhs), Value::Vec3(x, y, z)) => Value::Vec3(lhs * x, lhs * y, lhs * z),
+                (Value::Vec3(x, y, z), Value::Num(rhs)) => Value::Vec3(rhs * x, rhs * y, rhs * z),
+                (Value::Vec3(x1, y1, z1), Value::Vec3(x2, y2, z2)) => {
+                    Value::Vec3(x1 * x2, y1 * y2, z1 * z2)
+                }
                 _ => panic!("Invalid operands for multiplication"),
             }
         }
@@ -75,6 +86,7 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
             let rhs = eval_expr(b, variables, funcs);
             match (lhs, rhs) {
                 (Value::Num(lhs), Value::Num(rhs)) => Value::Num(lhs / rhs),
+                (Value::Vec3(x, y, z), Value::Num(rhs)) => Value::Vec3(x / rhs, y / rhs, z / rhs),
                 _ => panic!("Invalid operands for division"),
             }
         }
