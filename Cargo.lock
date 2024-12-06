@@ -382,6 +382,7 @@ dependencies = [
  "pg-indicator",
  "rand",
  "ray-tracer-rs",
+ "serde",
 ]
 
 [[package]]
@@ -719,10 +720,11 @@ dependencies = [
 [[package]]
 name = "ray-tracer-rs"
 version = "0.1.0"
-source = "git+https://github.com/SNKK62/toy-ray-tracer-rs?rev=651de45#651de45ea3b237f3117a776b2fbf721949c30d0a"
+source = "git+https://github.com/SNKK62/toy-ray-tracer-rs?rev=02e2b50#02e2b509db1853055498e4a762b4495745227598"
 dependencies = [
  "image",
  "rand",
+ "serde",
 ]
 
 [[package]]

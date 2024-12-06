@@ -1,4 +1,5 @@
 use ray_tracer_rs::{material::MaterialEnum, texture::TextureEnum, vec3::Vec3};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone)]
 pub(super) enum Value {
@@ -21,6 +22,7 @@ impl Value {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct ConfigValue {
     pub width: f64,
     pub height: f64,
