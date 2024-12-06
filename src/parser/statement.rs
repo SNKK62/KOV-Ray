@@ -350,7 +350,15 @@ fn statements(i: Span) -> IResult<Span, AST> {
 pub fn statements_finish(i: Span) -> Result<AST, nom::error::Error<Span>> {
     let finish = statements(i).finish();
     match finish {
-        Ok((_, stmts)) => Ok(stmts),
+        Ok((i, stmts)) => {
+            if !i.fragment().is_empty() {
+                return Err(nom::error::Error {
+                    input: i,
+                    code: nom::error::ErrorKind::Tag,
+                });
+            }
+            Ok(stmts)
+        }
         Err(e) => Err(e),
     }
 }
