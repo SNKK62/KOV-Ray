@@ -135,6 +135,8 @@ fn cond_expr(i0: Span) -> IResult<Span, Expression> {
     let (i, cond) = space_delimited(alt((
         tag("||"),
         tag("&&"),
+        tag("<="),
+        tag(">="),
         tag("<"),
         tag(">"),
         tag("=="),
@@ -145,6 +147,8 @@ fn cond_expr(i0: Span) -> IResult<Span, Expression> {
     Ok((
         i,
         match *cond.fragment() {
+            "<=" => Expression::new(ExprEnum::Le(Box::new(first), Box::new(second)), span),
+            ">=" => Expression::new(ExprEnum::Ge(Box::new(first), Box::new(second)), span),
             "<" => Expression::new(ExprEnum::Lt(Box::new(first), Box::new(second)), span),
             ">" => Expression::new(ExprEnum::Gt(Box::new(first), Box::new(second)), span),
             "==" => Expression::new(ExprEnum::Eq(Box::new(first), Box::new(second)), span),

@@ -98,11 +98,27 @@ pub(super) fn eval_expr(ast: &Expression, variables: &mut Variables, funcs: &Fun
                 _ => panic!("Invalid operands for greater than"),
             }
         }
+        ExprEnum::Ge(a, b) => {
+            let lhs = eval_expr(a, variables, funcs);
+            let rhs = eval_expr(b, variables, funcs);
+            match (lhs, rhs) {
+                (Value::Num(lhs), Value::Num(rhs)) => Value::Bool(lhs >= rhs),
+                _ => panic!("Invalid operands for greater than"),
+            }
+        }
         ExprEnum::Lt(a, b) => {
             let lhs = eval_expr(a, variables, funcs);
             let rhs = eval_expr(b, variables, funcs);
             match (lhs, rhs) {
                 (Value::Num(lhs), Value::Num(rhs)) => Value::Bool(lhs < rhs),
+                _ => panic!("Invalid operands for less than"),
+            }
+        }
+        ExprEnum::Le(a, b) => {
+            let lhs = eval_expr(a, variables, funcs);
+            let rhs = eval_expr(b, variables, funcs);
+            match (lhs, rhs) {
+                (Value::Num(lhs), Value::Num(rhs)) => Value::Bool(lhs <= rhs),
                 _ => panic!("Invalid operands for less than"),
             }
         }
