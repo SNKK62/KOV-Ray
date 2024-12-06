@@ -29,7 +29,7 @@ type Variables = HashMap<String, value::Value>;
 
 const COLOR_MAX: f64 = 255.0;
 
-pub fn eval_ast(ast: &AST) -> (HittableEnum, ConfigValue, Camera) {
+pub fn eval_ast(ast: &AST) -> Result<(HittableEnum, ConfigValue, Camera), String> {
     let mut world = Vec::new();
     let mut config = None;
     let mut camera_config = None;
@@ -49,10 +49,10 @@ pub fn eval_ast(ast: &AST) -> (HittableEnum, ConfigValue, Camera) {
     let world = HittableEnum::BvhNode(Box::new(BvhNode::new(&mut world, 0.0, 0.0)));
 
     if config.is_none() {
-        panic!("Config not found");
+        return Err("Config not found".to_string());
     }
     if camera_config.is_none() {
-        panic!("Camera is not found");
+        return Err("Camera not found".to_string());
     }
 
     let config = config.unwrap();
@@ -69,12 +69,16 @@ pub fn eval_ast(ast: &AST) -> (HittableEnum, ConfigValue, Camera) {
         0.0,
         1.0,
     );
-    (world, config, camera)
+    Ok((world, config, camera))
 }
 
 #[cfg(feature = "execution")]
 pub fn interpret(ast: &AST) -> (Vec<u8>, u32, u32) {
-    let (world, config, camera) = eval_ast(ast);
+    let res = eval_ast(ast);
+    if res.is_err() {
+        panic!("Error: {:?}", res.err().unwrap());
+    }
+    let (world, config, camera) = res.unwrap();
     let world = Arc::new(world);
 
     let width = config.width.round() as u32;
