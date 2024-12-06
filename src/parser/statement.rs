@@ -348,6 +348,9 @@ fn statements(i: Span) -> IResult<Span, AST> {
 }
 
 pub fn statements_finish(i: Span) -> Result<AST, nom::error::Error<Span>> {
-    let (_, res) = statements(i).finish()?;
-    Ok(res)
+    let finish = statements(i).finish();
+    match finish {
+        Ok((_, stmts)) => Ok(stmts),
+        Err(e) => Err(e),
+    }
 }
