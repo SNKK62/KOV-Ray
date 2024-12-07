@@ -18,7 +18,7 @@ pub(super) fn eval_object(
     variables: &mut Variables,
     funcs: &Functions,
     world: &mut Vec<HittableEnum>,
-) {
+) -> Result<(), String> {
     let (mut obj, affine): (HittableEnum, &Vec<AffineProperties>) = match object {
         Object::Sphere {
             center,
@@ -26,16 +26,16 @@ pub(super) fn eval_object(
             material,
             affine,
         } => {
-            let (center, radius) = match (
-                eval_expr(center, variables, funcs),
-                eval_expr(radius, variables, funcs),
-            ) {
+            let center = eval_expr(center, variables, funcs)?;
+            let radius = eval_expr(radius, variables, funcs)?;
+            let (center, radius) = match (center, radius) {
                 (Value::Vec3(x, y, z), Value::Num(num)) => (Vec3::new(x, y, z), num),
-                _ => panic!("Invalid arguments for Sphere"),
+                _ => return Err("Invalid arguments for Sphere".to_string()),
             };
-            let material = match eval_expr(material, variables, funcs) {
+            let material = eval_expr(material, variables, funcs)?;
+            let material = match material {
                 Value::Material(material) => material,
-                _ => panic!("Invalid arguments for Sphere"),
+                _ => return Err("Invalid arguments for Sphere".to_string()),
             };
             (
                 HittableEnum::Sphere(Sphere::new(&center, radius, material)),
@@ -47,18 +47,18 @@ pub(super) fn eval_object(
             material,
             affine,
         } => {
-            let (vertex1, vertex2) = match (
-                eval_expr(&vertex.0, variables, funcs),
-                eval_expr(&vertex.1, variables, funcs),
-            ) {
+            let vertex1 = eval_expr(&vertex.0, variables, funcs)?;
+            let vertex2 = eval_expr(&vertex.1, variables, funcs)?;
+            let (vertex1, vertex2) = match (vertex1, vertex2) {
                 (Value::Vec3(x1, y1, z1), Value::Vec3(x2, y2, z2)) => {
                     (Vec3::new(x1, y1, z1), Vec3::new(x2, y2, z2))
                 }
-                _ => panic!("Invalid arguments for Box"),
+                _ => return Err("Invalid arguments for Box".to_string()),
             };
-            let material = match eval_expr(material, variables, funcs) {
+            let material = eval_expr(material, variables, funcs)?;
+            let material = match material {
                 Value::Material(material) => material,
-                _ => panic!("Invalid arguments for Box"),
+                _ => return Err("Invalid arguments for Box".to_string()),
             };
             (
                 HittableEnum::Cuboid(Cuboid::new(&vertex1, &vertex2, material)),
@@ -71,17 +71,17 @@ pub(super) fn eval_object(
             affine,
         } => {
             let (vertex1, vertex2) = match (
-                eval_expr(&vertex.0, variables, funcs),
-                eval_expr(&vertex.1, variables, funcs),
+                eval_expr(&vertex.0, variables, funcs)?,
+                eval_expr(&vertex.1, variables, funcs)?,
             ) {
                 (Value::Vec3(x1, y1, z1), Value::Vec3(x2, y2, z2)) => {
                     (Vec3::new(x1, y1, z1), Vec3::new(x2, y2, z2))
                 }
-                _ => panic!("Invalid arguments for Plane"),
+                _ => return Err("Invalid arguments for Plane".to_string()),
             };
-            let material = match eval_expr(material, variables, funcs) {
+            let material = match eval_expr(material, variables, funcs)? {
                 Value::Material(material) => material,
-                _ => panic!("Invalid arguments for Plane"),
+                _ => return Err("Invalid arguments for Plane".to_string()),
             };
             let rect: HittableEnum = if vertex1.x() == vertex2.x() {
                 HittableEnum::YZRect(YZRect::new(
@@ -111,14 +111,14 @@ pub(super) fn eval_object(
                     material,
                 ))
             } else {
-                panic!("Invalid vertex for Plane")
+                return Err("Invalid vertex for Plane".to_string());
             };
             (rect, affine)
         }
         Object::Objects { objects, affine } => {
             let mut objs = Vec::new();
             for obj in objects.iter() {
-                eval_object(obj, variables, funcs, &mut objs);
+                eval_object(obj, variables, funcs, &mut objs)?;
             }
             // TODO: apply motion blur
             (
@@ -130,16 +130,16 @@ pub(super) fn eval_object(
     for af in affine.iter() {
         match af {
             AffineProperties::Translation(expr) => {
-                let offset = match eval_expr(expr, variables, funcs) {
+                let offset = match eval_expr(expr, variables, funcs)? {
                     Value::Vec3(x, y, z) => Vec3::new(x, y, z),
-                    _ => panic!("Invalid arguments for Sphere"),
+                    _ => return Err("Invalid arguments for Sphere".to_string()),
                 };
                 obj = HittableEnum::Translation(Translation::new(obj, offset));
             }
             AffineProperties::Rotate(rotate) => {
-                let angle = match eval_expr(&rotate.expr, variables, funcs) {
+                let angle = match eval_expr(&rotate.expr, variables, funcs)? {
                     Value::Num(num) => num,
-                    _ => panic!("Invalid arguments for Rotate"),
+                    _ => return Err("Invalid arguments for Rotate".to_string()),
                 };
                 obj = match rotate.axis {
                     RotateAxis::X => HittableEnum::RotateX(Box::new(RotateX::new(obj, angle))),
@@ -150,4 +150,5 @@ pub(super) fn eval_object(
         }
     }
     world.push(obj);
+    Ok(())
 }

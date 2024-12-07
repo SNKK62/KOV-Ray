@@ -11,14 +11,34 @@ pub(super) enum Value {
     Texture(TextureEnum),
 }
 
+fn get_type_str(value: &Value) -> String {
+    match value {
+        Value::Num(_) => "Number",
+        Value::Str(_) => "String",
+        Value::Bool(_) => "Boolean",
+        Value::Vec3(x, y, z) => {
+            return format!("Vec3({}, {}, {})", x, y, z);
+        }
+        Value::Material(_) => "Material",
+        Value::Texture(_) => "Texture",
+    }
+    .to_string()
+}
+
 impl Value {
-    pub fn to_bool(&self) -> bool {
-        match self {
+    pub fn to_bool(&self) -> Result<bool, String> {
+        let val = match self {
             Value::Num(n) => *n != 0.0,
             Value::Str(s) => !s.is_empty(),
             Value::Bool(b) => *b,
-            _ => panic!("Cannot convert to bool"),
-        }
+            rest => {
+                return Err(format!(
+                    "\"{:?}\" Cannot convert to bool",
+                    get_type_str(rest)
+                ))
+            }
+        };
+        Ok(val)
     }
 }
 

@@ -43,7 +43,7 @@ pub fn eval_ast(ast: &AST) -> Result<(HittableEnum, ConfigValue, Camera), String
             &mut world,
             &mut config,
             &mut camera_config,
-        );
+        )?;
     }
     // TODO: apply motion blur
     let world = HittableEnum::BvhNode(Box::new(BvhNode::new(&mut world, 0.0, 0.0)));
