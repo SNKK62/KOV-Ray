@@ -155,7 +155,7 @@ fn cond_expr(i0: Span) -> IResult<Span, Expression> {
             "!=" => Expression::new(ExprEnum::Neq(Box::new(first), Box::new(second)), span),
             "&&" => Expression::new(ExprEnum::And(Box::new(first), Box::new(second)), span),
             "||" => Expression::new(ExprEnum::Or(Box::new(first), Box::new(second)), span),
-            _ => unreachable!(),
+            _ => panic!("Unknown operator"),
         },
     ))
 }
