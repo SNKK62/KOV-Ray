@@ -26,7 +26,7 @@ pub(super) fn eval_expr(
             let val = variables.get(*ident);
 
             if val.is_none() {
-                return Err(format!("variable {} not found", *ident));
+                return Err(format!("variable \"{}\" not found", *ident));
             }
             val.unwrap().clone()
         }
@@ -36,7 +36,7 @@ pub(super) fn eval_expr(
             let name = name.fragment();
             let func = funcs.get(*name);
             if func.is_none() {
-                return Err(format!("function {} not found", name));
+                return Err(format!("function \"{}\" not found", name));
             }
             let args = args
                 .iter()
