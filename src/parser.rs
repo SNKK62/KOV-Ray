@@ -8,7 +8,6 @@ use nom::{
     sequence::{delimited, pair},
     IResult, InputTake, Offset, Parser,
 };
-use std::error::Error;
 
 use crate::ast::{Span, AST};
 mod expression;
@@ -48,7 +47,7 @@ fn calc_offset<'a>(i: Span<'a>, r: Span<'a>) -> Span<'a> {
     i.take(i.offset(&r))
 }
 
-pub fn parse<'a>(i: &'a str) -> Result<AST<'a>, Box<dyn Error + 'a>> {
+pub fn parse(i: &str) -> Result<AST, nom::error::Error<Span>> {
     let i = Span::new(i);
     let res = statements_finish(i)?;
     Ok(res)

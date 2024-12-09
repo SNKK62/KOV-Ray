@@ -7,7 +7,7 @@ use statement::eval_stmt;
 mod value;
 pub use value::ConfigValue;
 
-use crate::ast::AST;
+use crate::ast::{Span, AST};
 
 #[cfg(feature = "execution")]
 use pg_indicator::{PGOutput, PGStyle, ProgressBar};
@@ -29,7 +29,13 @@ type Variables = HashMap<String, value::Value>;
 
 const COLOR_MAX: f64 = 255.0;
 
-pub fn eval_ast(ast: &AST) -> Result<(HittableEnum, ConfigValue, Camera), String> {
+#[derive(Debug, Clone)]
+pub struct EvalError<'a> {
+    pub message: String,
+    pub span: Option<Span<'a>>,
+}
+
+pub fn eval_ast<'a>(ast: &'a AST) -> Result<(HittableEnum, ConfigValue, Camera), EvalError<'a>> {
     let mut world = Vec::new();
     let mut config = None;
     let mut camera_config = None;
@@ -49,10 +55,16 @@ pub fn eval_ast(ast: &AST) -> Result<(HittableEnum, ConfigValue, Camera), String
     let world = HittableEnum::BvhNode(Box::new(BvhNode::new(&mut world, 0.0, 0.0)));
 
     if config.is_none() {
-        return Err("Config not found".to_string());
+        return Err(EvalError {
+            span: None,
+            message: "Config not found".to_string(),
+        });
     }
     if camera_config.is_none() {
-        return Err("Camera not found".to_string());
+        return Err(EvalError {
+            span: None,
+            message: "Camera not found".to_string(),
+        });
     }
 
     let config = config.unwrap();

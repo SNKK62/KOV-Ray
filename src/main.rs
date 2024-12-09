@@ -12,8 +12,14 @@ fn main() {
         std::process::exit(1);
     });
     let output = args.output;
-    let ast = parser::parse(&source).unwrap_or_else(|e| {
-        eprintln!("Failed to parse file {}:\n {}", source_file_name, e);
+    let ast = parser::parse(&source).unwrap_or_else(|e: nom::error::Error<kov_ray::ast::Span>| {
+        eprintln!(
+            "Failed to parse file {}:{}:{}\n{}",
+            source_file_name,
+            e.input.location_line(),
+            e.input.location_offset(),
+            e
+        );
         std::process::exit(1)
     });
     if args.show_ast {
