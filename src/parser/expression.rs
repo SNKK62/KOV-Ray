@@ -161,7 +161,7 @@ fn cond_expr(i0: Span) -> IResult<Span, Expression> {
 }
 
 pub(super) fn expr(i: Span) -> IResult<Span, Expression> {
-    alt((cond_expr, num_expr, vec3_expr))(i)
+    alt((cond_expr, num_expr))(i)
 }
 
 pub(super) fn vec3_expr(i0: Span) -> IResult<Span, Expression> {

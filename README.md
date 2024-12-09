@@ -23,9 +23,12 @@ cargo run --release --features execution -- -o <output_path> <scene_file_path>
 <div>
 
 ```
+LOOK_FROM = <278, 278, -800>;
+LOOK_AT = <278, 278, 0>;
+
 Camera {
-    lookfrom: <278, 278, -800>,
-    lookat: <278, 278, 0>,
+    lookfrom: LOOK_FROM, // camera position
+    lookat: LOOK_AT,
     dist_to_focus: 10,
     angle: 40,
 }
