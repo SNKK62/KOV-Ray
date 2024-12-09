@@ -61,7 +61,7 @@ pub(super) fn eval_object<'a>(
             let vertex2 = eval_expr(&vertex.1, variables, funcs)?;
             let (vertex1, vertex2) = match (vertex1, vertex2) {
                 (Value::Vec3(x1, y1, z1), Value::Vec3(x2, y2, z2)) => {
-                    if !(x1 == x2 || y1 == y2 || z1 == z2) {
+                    if (x1 == x2 || y1 == y2 || z1 == z2) {
                         return Err(EvalError {
                             span: Some(vertex.0.span),
                             message: "Box vertexes should be completely different".to_string(),
