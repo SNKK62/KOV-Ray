@@ -533,4 +533,5 @@ If n < 10 {
 - `log(x: number, base: number) -> number`
 - `log10(x: number) -> number`
 - `rand() -> number(0.0-1.0)`
+- `len(v: Vec3) -> number`
 
