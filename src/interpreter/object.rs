@@ -119,7 +119,10 @@ pub(super) fn eval_object<'a>(
                     });
                 }
             };
-            let rect: HittableEnum = if vertex1.x() == vertex2.x() {
+            let is_x_same = vertex1.x() == vertex2.x();
+            let is_y_same = vertex1.y() == vertex2.y();
+            let is_z_same = vertex1.z() == vertex2.z();
+            let rect: HittableEnum = if is_x_same && !is_y_same && !is_z_same {
                 HittableEnum::YZRect(YZRect::new(
                     vertex1.y(),
                     vertex2.y(),
@@ -128,7 +131,7 @@ pub(super) fn eval_object<'a>(
                     vertex1.x(),
                     material,
                 ))
-            } else if vertex1.y() == vertex2.y() {
+            } else if is_y_same && !is_x_same && !is_z_same {
                 HittableEnum::XZRect(XZRect::new(
                     vertex1.x(),
                     vertex2.x(),
@@ -137,7 +140,7 @@ pub(super) fn eval_object<'a>(
                     vertex1.y(),
                     material,
                 ))
-            } else if vertex1.z() == vertex2.z() {
+            } else if is_z_same && !is_x_same && !is_y_same {
                 HittableEnum::XYRect(XYRect::new(
                     vertex1.x(),
                     vertex2.x(),
